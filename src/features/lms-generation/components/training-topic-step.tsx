@@ -39,9 +39,7 @@ export function TrainingTopicStep({
     <div className='max-w-2xl'>
       <div className='space-y-6'>
         <div>
-          <h1 className='text-foreground mb-2 text-3xl font-bold'>
-            Training Topic
-          </h1>
+          <h1 className='mb-2 text-2xl font-bold'>Training Topic</h1>
           <p className='text-muted-foreground'>
             Specify the training focus so AI can organize your materials and
             generate aligned content.
@@ -82,21 +80,20 @@ export function TrainingTopicStep({
           </div>
         </div>
 
-        <div className='flex justify-between pt-8'>
-          <Button
-            variant='ghost'
-            onClick={onBack}
-            disabled={true}
-            className='px-8'
-          >
-            Back
-          </Button>
+        <div className='flex flex-col justify-between gap-4 pt-8'>
           <Button
             onClick={onNext}
-            disabled={!isValid}
+            // disabled={!isValid}
             className='bg-primary hover:bg-primary/90 px-8'
           >
             Continue
+          </Button>
+          <Button
+            variant='ghost'
+            onClick={onBack}
+            className='bg-primary/30 hover:bg-primary/40 text-primary px-8'
+          >
+            Back
           </Button>
         </div>
       </div>

@@ -10,6 +10,8 @@ import { SuggestedModulesStep } from './suggested-modules-step';
 import { TrainingOutputsStep } from './training-outputs-step';
 import { CompletionStep } from './completion-step';
 import { StepNavigation } from './step-navigation';
+import LikeIcon from '@/components/ui/icon/like';
+import Image from 'next/image';
 
 export type WizardStep =
   | 'topic'
@@ -135,102 +137,37 @@ export function LmsGenerationWizard() {
 
   return (
     <PageContainer>
-      <div className='space-y-4'>
+      <div className='w-full space-y-4'>
         {/* Header with greeting and navigation */}
         <div className='space-y-4'>
-          <div className='space-y-2'>
-            <div className='text-muted-foreground flex items-center text-sm'>
-              <span>Good Morning, Amy!</span>
+          <div className='flex items-center justify-between'>
+            <div>
+              <h1 className='text-foreground text-3xl font-bold'>
+                Good Morning, Amy!
+              </h1>
+              <p className='text-muted-foreground mt-1'>
+                Quickly access your recent training, courses and workspaces
+              </p>
             </div>
-            <div className='text-muted-foreground text-sm'>
-              Quickly access your recent training, courses and workspaces
+            <div className='text-primary flex items-center gap-2'>
+              <LikeIcon />
+              <span className='text-primary'>Give Feedback</span>
             </div>
           </div>
-
-          {/* Step Navigation */}
-          <StepNavigation
-            steps={steps}
-            currentStep={currentStep}
-            onStepClick={setCurrentStep}
-          />
         </div>
-
-        {/* Main Content Area */}
-        <div className='flex gap-6'>
-          {/* Left Content */}
-          <div className='flex-1'>{renderCurrentStep()}</div>
-
+        <div className='flex w-full flex-row justify-between'>
+          <div className='flex flex-col gap-6'>
+            {/* Step Navigation */}
+            <StepNavigation
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={setCurrentStep}
+            />
+            <div className='flex-1'>{renderCurrentStep()}</div>
+          </div>
           {/* Right Sidebar - Video Preview */}
-          <div className='w-80 space-y-4'>
-            <div className='bg-card space-y-4 rounded-lg border p-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-medium'>Simplify</h3>
-                <div className='text-muted-foreground flex items-center space-x-2'>
-                  <button className='hover:text-foreground text-xs'>−</button>
-                  <button className='hover:text-foreground text-xs'>□</button>
-                  <button className='hover:text-foreground text-xs'>✕</button>
-                </div>
-              </div>
-
-              <div className='space-y-2'>
-                <div className='text-sm font-medium'>Good Morning, Amy!</div>
-                <div className='text-muted-foreground text-xs'>
-                  Quickly access your recent training, courses and workspaces
-                </div>
-              </div>
-
-              <div className='space-y-4'>
-                <div>
-                  <div className='text-muted-foreground mb-2 text-xs tracking-wide uppercase'>
-                    MODULE 1
-                  </div>
-                  <div className='mb-1 text-sm font-medium'>
-                    Training Module
-                  </div>
-                </div>
-
-                {/* Video Preview */}
-                <div className='bg-muted relative overflow-hidden rounded-lg'>
-                  <div className='from-muted to-muted-foreground/20 flex aspect-video items-center justify-center bg-gradient-to-br'>
-                    <div className='bg-primary/20 flex h-16 w-16 items-center justify-center rounded-full'>
-                      <div className='border-l-primary ml-1 h-0 w-0 border-t-3 border-b-3 border-l-6 border-t-transparent border-b-transparent'></div>
-                    </div>
-                  </div>
-
-                  <div className='absolute right-2 bottom-2 left-2'>
-                    <div className='rounded bg-black/50 px-2 py-1 text-xs text-white'>
-                      00:00 / 02:30
-                    </div>
-                  </div>
-                </div>
-
-                <div className='space-y-2'>
-                  <div className='text-sm font-medium'>Lesson #1</div>
-                  <div className='text-muted-foreground text-xs leading-relaxed'>
-                    Simplify offers an AI-focused training platform that
-                    automatically creates and distributes knowledge into
-                    structured courses, videos, and quizzes. It can extract
-                    concepts, generate assessments, and personalize learning to
-                    support industry-specific training such as Prior
-                    Authorization, Claims processing...
-                  </div>
-                </div>
-
-                <div className='space-y-3'>
-                  <div className='text-muted-foreground text-xs'>
-                    Upgrade your plan
-                  </div>
-
-                  <div className='text-muted-foreground space-y-1 text-xs'>
-                    <div>Your free plan enables 1-3 days</div>
-                    <div>Upgrade your plan and unlock</div>
-                    <div>full potential</div>
-                  </div>
-
-                  <Button className='w-full text-xs'>See plans</Button>
-                </div>
-              </div>
-            </div>
+          <div className='-mr-4 h-[790px]'>
+            <img src='/preview.png' alt='' className='h-[790px] object-cover' />
           </div>
         </div>
       </div>

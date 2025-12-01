@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { WizardStep } from './lms-generation-wizard';
+import { ChevronRight } from 'lucide-react';
 
 interface Step {
   id: WizardStep;
@@ -76,7 +77,7 @@ export function StepNavigation({
             </span>
 
             {index < steps.length - 1 && (
-              <div className='bg-muted mx-4 h-px w-8' />
+              <ChevronRight className='mx-4 h-4 w-4' />
             )}
           </div>
         ))}
