@@ -15,9 +15,12 @@ import {
   IconSparkles,
   IconGrid4x4,
   IconFileText,
-  IconCertificate
+  IconCertificate,
+  IconSearch,
+  IconWorld
 } from '@tabler/icons-react';
 import LikeIcon from '@/components/ui/icon/like';
+import { CircleChevronRight, LayoutGrid } from 'lucide-react';
 
 const featuredTemplates = [
   {
@@ -64,99 +67,115 @@ const templates = [
 export default function TemplatesPage() {
   return (
     <PageContainer scrollable>
-      <div className='w-full space-y-6'>
-        <div className='space-y-4'>
-          <div className='flex items-center justify-between border-b px-8 py-2'>
-            <div>
-              <h1 className='text-foreground text-lg font-bold'>
-                Good Morning, Amy!
-              </h1>
-              <p className='text-foreground mt-1 text-sm'>
-                Quickly access your recent training, courses and workspaces
-              </p>
-            </div>
-            <div className='text-primary flex items-center gap-2'>
-              <LikeIcon />
-              <span className='text-sm text-[#2D286B]'>Give Feedback</span>
-            </div>
+      <div className='w-full space-y-6 pb-8'>
+        <div className='flex items-center justify-between border-b px-8 py-2'>
+          <div>
+            <h1 className='text-foreground text-lg font-bold'>
+              Good Morning, Amy!
+            </h1>
+            <p className='text-foreground mt-1 text-sm'>
+              Quickly access your recent training, courses and workspaces
+            </p>
+          </div>
+          <div className='text-primary flex items-center gap-2'>
+            <LikeIcon />
+            <span className='text-sm text-[#2D286B]'>Give Feedback</span>
           </div>
         </div>
-
-        <div className='space-y-6'>
+        <div className='space-y-6 px-8'>
           <div>
-            <div className='mb-4'>
-              <p className='text-muted-foreground text-sm tracking-wide uppercase'>
+            <div className='mb-8'>
+              <p className='text-primary mb-2 text-xs font-bold tracking-wide uppercase'>
                 MARKETPLACE
               </p>
-              <h2 className='text-2xl font-bold'>Templates</h2>
+              <h2 className='text-foreground text-2xl font-semibold'>
+                Templates
+              </h2>
+            </div>
+
+            {/* Search Bar */}
+            <div className='relative mb-4'>
+              <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
+              <Input placeholder='Search' className='h-11 pl-10' />
             </div>
 
             {/* AI Assist Search Banner */}
             <div
-              className='relative mb-8 overflow-hidden rounded-xl p-8'
+              className='relative mb-8 overflow-hidden bg-cover bg-center px-5 py-4'
               style={{
-                background:
-                  'linear-gradient(135deg, #D946EF 0%, #EC4899 50%, #F97316 100%)'
+                backgroundImage: 'url(/bg-image.webp)'
               }}
             >
-              <div className='relative z-10'>
-                <Button
-                  variant='secondary'
-                  size='sm'
-                  className='mb-4 gap-2 bg-white/20 text-white hover:bg-white/30'
-                >
+              <div className='relative z-10 space-y-6'>
+                <Button className='bg-primary hover:bg-primary/20 min-w-[180px] gap-2 rounded-sm text-white'>
                   <IconSparkles className='h-4 w-4' />
                   AI Assist
                 </Button>
-                <div className='mb-4 flex items-center gap-2'>
+                <div className='flex items-center justify-center gap-4'>
                   <Input
                     placeholder='Build me a gamified quiz template'
-                    className='h-12 max-w-xl border-white/30 bg-white/10 text-white placeholder:text-white/70'
+                    className='h-12 max-w-2xl rounded-none border-0 border-b border-[#ECF0F5] bg-transparent text-center text-2xl font-medium text-white placeholder:text-2xl placeholder:font-medium placeholder:text-white/90'
                   />
                   <Button
-                    variant='secondary'
-                    className='bg-white text-gray-900 hover:bg-white/90'
+                    size='lg'
+                    className='h-12 rounded-lg border border-white bg-transparent px-8 text-white hover:bg-white/10'
                   >
                     Search
                   </Button>
                 </div>
-                <Button
-                  variant='ghost'
-                  className='text-white hover:bg-white/20'
-                >
-                  Create Custom Templates
-                </Button>
+                <div className='flex justify-center'>
+                  <Button
+                    variant='ghost'
+                    className='rounded-md border border-white/30 bg-white/10 text-white backdrop-blur-[14.76px] hover:bg-white/20 hover:text-white'
+                  >
+                    Create Custom Templates
+                  </Button>
+                </div>
               </div>
             </div>
 
             {/* Featured Section */}
             <div className='mb-8'>
-              <div className='mb-4 flex items-center justify-between'>
+              <div className='mb-6 flex items-center justify-between border-b pb-2.5'>
                 <div className='flex items-center gap-2'>
-                  <IconGrid4x4 className='h-5 w-5' />
-                  <h3 className='text-lg font-semibold'>Featured</h3>
+                  <LayoutGrid className='text-foreground h-6 w-6' />
+                  <h3 className='text-foreground text-sm font-medium'>
+                    Featured
+                  </h3>
                 </div>
-                <Button variant='ghost' className='gap-2 text-sm'>
+                <Button
+                  variant='link'
+                  className='text-foreground gap-2 text-sm'
+                >
                   See more
-                  <IconArrowRight className='h-4 w-4' />
+                  <CircleChevronRight className='h-5 w-5' />
                 </Button>
               </div>
               <div className='grid gap-6 md:grid-cols-2'>
                 {featuredTemplates.map((template) => (
-                  <Card key={template.id} className='overflow-hidden'>
-                    <div className='h-48 bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950' />
-                    <CardHeader>
-                      <div className='mb-2'>
-                        <Badge variant='secondary' className='text-xs'>
+                  <Card
+                    key={template.id}
+                    className='overflow-hidden rounded-md border-none py-4 shadow-none'
+                    style={{
+                      background:
+                        'linear-gradient(270deg, rgba(255, 255, 255, 0.8) 0%, rgba(240, 239, 253, 0.8) 71.8%)'
+                    }}
+                  >
+                    <CardHeader className='px-4 pb-9'>
+                      <div>
+                        <div className='text-foreground text-xs'>
                           {template.category}
-                        </Badge>
+                        </div>
+                        <CardTitle className='text-foreground text-lg font-semibold'>
+                          {template.title}
+                        </CardTitle>
                       </div>
-                      <CardTitle className='text-xl'>
-                        {template.title}
-                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <Button variant='ghost' className='gap-2 p-0 text-sm'>
+                      <Button
+                        variant='ghost'
+                        className='text-foreground hover:text-foreground rounded-md border border-white/30 bg-white/50 backdrop-blur-[14.76px] hover:bg-white/20'
+                      >
                         Explore Templates
                         <IconArrowRight className='h-4 w-4' />
                       </Button>
@@ -169,32 +188,33 @@ export default function TemplatesPage() {
             {/* Editor Choice Templates */}
             <div className='grid gap-6 md:grid-cols-3'>
               {templates.map((template) => (
-                <Card key={template.id} className='overflow-hidden'>
-                  <CardHeader className='space-y-4'>
+                <Card
+                  key={template.id}
+                  className='overflow-hidden bg-white p-4'
+                >
+                  <CardHeader className='space-y-6 p-0'>
                     <div className='flex items-start justify-between'>
-                      <div className='bg-muted flex h-12 w-12 items-center justify-center rounded-lg'>
+                      <div className='text-primary flex h-10.5 w-10.5 items-center justify-center rounded-full border'>
                         {template.icon === 'book' && (
                           <IconBook className='h-6 w-6' />
                         )}
                         {template.icon === 'grid' && (
-                          <IconGrid4x4 className='h-6 w-6' />
+                          <IconWorld className='h-6 w-6' />
                         )}
                         {template.icon === 'certificate' && (
-                          <IconCertificate className='h-6 w-6' />
+                          <IconFileText className='h-6 w-6' />
                         )}
                       </div>
-                      <Badge variant='secondary' className='text-xs'>
-                        {template.category}
-                      </Badge>
+                      <Button variant='outline'>Editor choice</Button>
                     </div>
                     <div>
-                      <CardTitle className='mb-2 text-lg'>
+                      <CardTitle className='text-foreground text-xl font-semibold'>
                         {template.title}
                       </CardTitle>
-                      <p className='text-muted-foreground mb-1 text-xs'>
+                      <p className='text-foreground mb-4 text-xs'>
                         {template.provider}
                       </p>
-                      <CardDescription className='text-sm'>
+                      <CardDescription className='text-foreground text-sm leading-relaxed'>
                         {template.description}
                       </CardDescription>
                     </div>
@@ -202,32 +222,6 @@ export default function TemplatesPage() {
                 </Card>
               ))}
             </div>
-          </div>
-
-          {/* AI Assist Section */}
-          <div className='mt-8'>
-            <h3 className='mb-4 text-lg font-semibold'>AI Assist</h3>
-            <Card
-              className='overflow-hidden'
-              style={{
-                background:
-                  'linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(360deg, rgba(91, 81, 213, 0.05) 0%, rgba(255, 255, 255, 0) 100%)'
-              }}
-            >
-              <CardContent className='p-6'>
-                <p className='text-muted-foreground mb-4 text-sm'>
-                  AI Assist simplifies content creation with fast AI-powered
-                  suggestions and improvements.
-                </p>
-                <div className='bg-muted mb-4 h-2 w-full overflow-hidden rounded-full'>
-                  <div className='bg-primary h-full w-3/4'></div>
-                </div>
-                <Button className='w-full gap-2'>
-                  <IconSparkles className='h-4 w-4' />
-                  AI Assist
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

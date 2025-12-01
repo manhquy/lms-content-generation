@@ -151,7 +151,7 @@ export default function AppSidebar() {
         </SidebarGroup>
         <SidebarGroup>
           <div className='mt-6 flex items-center justify-between rounded-md border p-2'>
-            <SidebarGroupLabel className='h-auto pl-0 text-sm font-semibold'>
+            <SidebarGroupLabel className='h-auto pl-1 text-sm font-medium'>
               Add Items
             </SidebarGroupLabel>
             <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-sm'>
