@@ -84,10 +84,10 @@ export default function AppSidebar() {
           defaultTenant={activeTenant}
           onTenantSwitch={handleSwitchTenant}
         />
-        <div className='px-2 py-2'>
+        <div className='mb-6'>
           <div className='relative'>
-            <IconSearch className='text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2' />
-            <Input placeholder='Search...' className='h-9 pl-8' />
+            <IconSearch className='text-muted-foreground absolute top-1/2 left-2 h-5 w-5 -translate-y-1/2' />
+            <Input placeholder='Search...' className='h-10 pl-8' />
           </div>
         </div>
       </SidebarHeader>
@@ -150,16 +150,24 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <div className='flex items-center justify-between px-2'>
-            <SidebarGroupLabel>Add Items</SidebarGroupLabel>
-            <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-md'>
+          <div className='mt-6 flex items-center justify-between rounded-md border p-2'>
+            <SidebarGroupLabel className='h-auto pl-0 text-sm font-semibold'>
+              Add Items
+            </SidebarGroupLabel>
+            <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-sm'>
               <IconPlus className='h-4 w-4' />
             </button>
           </div>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <div className='bg-primary/10 mx-2 mb-4 rounded-lg p-4'>
+      <SidebarFooter className='mb-20'>
+        <div
+          className='rounded-md'
+          style={{
+            background:
+              'linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(360deg, rgba(91, 81, 213, 0.05) 0%, rgba(255, 255, 255, 0) 100%)'
+          }}
+        >
           <div className='mb-2 flex items-start justify-between'>
             <h3 className='text-sm font-semibold'>AI Assist</h3>
           </div>
@@ -175,68 +183,6 @@ export default function AppSidebar() {
             AI Assist
           </button>
         </div>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size='lg'
-                  className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
-                >
-                  {user && (
-                    <UserAvatarProfile
-                      className='h-8 w-8 rounded-lg'
-                      showInfo
-                      user={user}
-                    />
-                  )}
-                  <IconChevronsDown className='ml-auto size-4' />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
-                side='bottom'
-                align='end'
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='px-1 py-1.5'>
-                    {user && (
-                      <UserAvatarProfile
-                        className='h-8 w-8 rounded-lg'
-                        showInfo
-                        user={user}
-                      />
-                    )}
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={() => router.push('/dashboard/profile')}
-                  >
-                    <IconUserCircle className='mr-2 h-4 w-4' />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconCreditCard className='mr-2 h-4 w-4' />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconBell className='mr-2 h-4 w-4' />
-                    Notifications
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <IconLogout className='mr-2 h-4 w-4' />
-                  {/* <SignOutButton redirectUrl='/auth/sign-in' /> */}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
