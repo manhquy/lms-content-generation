@@ -144,9 +144,9 @@ export function UploadFilesStep({
   return (
     <div className='max-w-2xl'>
       <div className='space-y-6'>
-        <div>
-          <h1 className='mb-2 text-2xl font-bold'>Upload Files</h1>
-          <p className=''>
+        <div className='mt-3'>
+          <h1 className='mb-2 text-2xl font-semibold'>Upload Files</h1>
+          <p className='text-md font-medium'>
             Add documents, PDFs, slides, or notes. AI will analyze them to
             create structured training content.
           </p>

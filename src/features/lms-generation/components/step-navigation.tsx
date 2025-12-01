@@ -44,10 +44,10 @@ export function StepNavigation({
               className={cn(
                 'flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors',
                 isStepActive(step.id)
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-[#575389] text-white'
                   : isStepCompleted(step.number)
-                    ? 'bg-green-500 text-white'
-                    : 'border-foreground border bg-white'
+                    ? 'bg-[#575389] text-white'
+                    : 'text-foreground border-foreground border'
               )}
             >
               {isStepCompleted(step.number) ? (
@@ -69,8 +69,8 @@ export function StepNavigation({
 
             <span
               className={cn(
-                'ml-2 text-sm font-medium',
-                isStepActive(step.id) ? 'text-primary' : 'text-muted-foreground'
+                'ml-2 text-sm font-semibold',
+                isStepActive(step.id) ? 'text-foreground' : 'text-foreground'
               )}
             >
               {step.label}

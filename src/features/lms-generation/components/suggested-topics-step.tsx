@@ -1,9 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { FormData } from './lms-generation-wizard';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 interface SuggestedTopicsStepProps {
   formData: FormData;
@@ -31,6 +41,10 @@ export function SuggestedTopicsStep({
   onNext,
   onBack
 }: SuggestedTopicsStepProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newTopic, setNewTopic] = useState('');
+  const [customTopics, setCustomTopics] = useState<string[]>([]);
+
   const handleTopicToggle = (topic: string, checked: boolean) => {
     let updatedTopics;
     if (checked) {
@@ -42,26 +56,67 @@ export function SuggestedTopicsStep({
   };
 
   const handleAddTopics = () => {
-    // This would open a modal or allow custom topic addition
-    console.log('Add custom topics');
+    setIsDialogOpen(true);
   };
+
+  const handleAddNewTopic = () => {
+    if (newTopic.trim() && !customTopics.includes(newTopic.trim())) {
+      const updatedCustomTopics = [...customTopics, newTopic.trim()];
+      setCustomTopics(updatedCustomTopics);
+      setNewTopic('');
+    }
+  };
+
+  const handleRemoveCustomTopic = (topicToRemove: string) => {
+    const updatedCustomTopics = customTopics.filter((t) => t !== topicToRemove);
+    setCustomTopics(updatedCustomTopics);
+    // Also remove from selected topics if it was selected
+    const updatedSelectedTopics = formData.selectedTopics.filter(
+      (t) => t !== topicToRemove
+    );
+    onUpdate({ selectedTopics: updatedSelectedTopics });
+  };
+
+  const handleSaveCustomTopics = () => {
+    // Automatically select all newly added custom topics
+    const newlyAddedTopics = customTopics.filter(
+      (topic) => !formData.selectedTopics.includes(topic)
+    );
+    const updatedSelectedTopics = [
+      ...formData.selectedTopics,
+      ...newlyAddedTopics
+    ];
+    onUpdate({ selectedTopics: updatedSelectedTopics });
+    setIsDialogOpen(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddNewTopic();
+    }
+  };
+
+  // Combine default topics with custom topics
+  const allTopics = [...topics, ...customTopics];
 
   return (
     <div className='max-w-2xl'>
       <div className='space-y-6'>
-        <div>
-          <h1 className='text-foreground mb-2 text-3xl font-bold'>
+        <div className='mt-3'>
+          <h1 className='text-foreground mb-2 text-2xl font-semibold'>
             Suggested Topics
           </h1>
-          <p className='text-muted-foreground'>
+          <p className='text-foreground text-md font-medium'>
             Here are the topics AI found in your document. Add or adjust before
             moving forward.
           </p>
         </div>
 
         <div className='flex flex-wrap gap-3'>
-          {topics.map((topic) => {
+          {allTopics.map((topic) => {
             const isSelected = formData.selectedTopics.includes(topic);
+            const isCustom = customTopics.includes(topic);
             return (
               <label
                 key={topic}
@@ -75,6 +130,18 @@ export function SuggestedTopicsStep({
                   className='h-4 w-4 rounded-full border border-gray-300 transition-colors data-[state=checked]:border-green-500 data-[state=checked]:bg-green-500'
                 />
                 <span className='text-sm font-medium'>{topic}</span>
+                {isCustom && (
+                  <button
+                    type='button'
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleRemoveCustomTopic(topic);
+                    }}
+                    className='hover:bg-destructive/20 ml-1 rounded-full p-0.5 transition-colors'
+                  >
+                    <X className='text-destructive size-3' />
+                  </button>
+                )}
               </label>
             );
           })}
@@ -107,6 +174,80 @@ export function SuggestedTopicsStep({
           </Button>
         </div>
       </div>
+
+      {/* Add Topics Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className='sm:max-w-[500px]'>
+          <DialogHeader>
+            <DialogTitle>Add Custom Topics</DialogTitle>
+            <DialogDescription>
+              Add your own custom topics to the list. Press Enter or click Add
+              to add each topic.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <div className='flex gap-2'>
+              <Input
+                placeholder='Enter topic name...'
+                value={newTopic}
+                onChange={(e) => setNewTopic(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className='flex-1'
+              />
+              <Button
+                type='button'
+                onClick={handleAddNewTopic}
+                disabled={!newTopic.trim()}
+                className='bg-primary hover:bg-primary/90'
+              >
+                <Plus className='mr-1 size-4' />
+                Add
+              </Button>
+            </div>
+
+            {customTopics.length > 0 && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Custom Topics:</h4>
+                <div className='flex flex-wrap gap-2'>
+                  {customTopics.map((topic) => (
+                    <div
+                      key={topic}
+                      className='border-primary bg-primary/10 flex items-center gap-2 rounded-full border px-3 py-1.5'
+                    >
+                      <span className='text-sm'>{topic}</span>
+                      <button
+                        type='button'
+                        onClick={() => handleRemoveCustomTopic(topic)}
+                        className='hover:bg-destructive/20 rounded-full p-0.5 transition-colors'
+                      >
+                        <X className='text-destructive size-3' />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='button'
+              onClick={handleSaveCustomTopics}
+              className='bg-primary hover:bg-primary/90'
+            >
+              Save Topics
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

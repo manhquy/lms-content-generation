@@ -38,9 +38,9 @@ export function TrainingTopicStep({
   return (
     <div className='max-w-2xl'>
       <div className='space-y-6'>
-        <div>
-          <h1 className='mb-2 text-2xl font-bold'>Training Topic</h1>
-          <p className=''>
+        <div className='mt-3'>
+          <h1 className='mb-2 text-2xl font-semibold'>Training Topic</h1>
+          <p className='text-md font-medium'>
             Specify the training focus so AI can organize your materials and
             generate aligned content.
           </p>
@@ -48,7 +48,7 @@ export function TrainingTopicStep({
 
         <div className='space-y-6'>
           <div className='space-y-2'>
-            <Label htmlFor='training-topic' className='text-base font-medium'>
+            <Label htmlFor='training-topic' className='text-sm font-medium'>
               Training Topic
             </Label>
             <Input
@@ -61,7 +61,7 @@ export function TrainingTopicStep({
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='workspace' className='text-base font-medium'>
+            <Label htmlFor='workspace' className='text-sm font-medium'>
               Workspace
             </Label>
             <Select

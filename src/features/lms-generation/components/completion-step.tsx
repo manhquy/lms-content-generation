@@ -33,15 +33,15 @@ export function CompletionStep({
         {/* Success Icon */}
         <div className='flex justify-center'>
           <div className='flex h-16 w-16 items-center justify-center rounded-full bg-green-100'>
-            <CheckCircle className='h-10 w-10 text-green-600' />
+            <CheckCircle className='h-12 w-12 text-green-600' />
           </div>
         </div>
 
         <div>
-          <h1 className='text-foreground mb-4 text-3xl font-bold'>
+          <h1 className='text-foreground mb-4 text-2xl font-semibold'>
             Congratulations! Time to Review 🚀
           </h1>
-          <p className='text-muted-foreground text-lg'>
+          <p className='text-muted-foreground text-md font-medium'>
             You're all set. Review your selected topics, modules, and output
             types before AI generates your full training package.
           </p>

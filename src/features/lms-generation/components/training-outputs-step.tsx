@@ -66,11 +66,11 @@ export function TrainingOutputsStep({
     <>
       <div className='max-w-2xl'>
         <div className='space-y-6'>
-          <div>
-            <h1 className='text-foreground mb-2 text-3xl font-bold'>
+          <div className='mt-3'>
+            <h1 className='text-foreground mb-2 text-2xl font-semibold'>
               Choose Your Training Outputs
             </h1>
-            <p className='text-muted-foreground'>
+            <p className='text-muted-foreground text-md font-medium'>
               Select the content formats required for your program. AI will
               produce each deliverable automatically.
             </p>
@@ -123,16 +123,16 @@ export function TrainingOutputsStep({
             <div className='flex justify-center'>
               <div className='flex items-center justify-center rounded-full bg-green-100 p-2'>
                 <div className='rounded-full bg-green-600 p-1'>
-                  <Check className='h-7 w-7 text-white' />
+                  <Check className='h-12 w-12 text-white' />
                 </div>
               </div>
             </div>
 
             <div className='text-center'>
-              <h2 className='text-foreground mb-3 text-2xl font-bold'>
+              <h2 className='text-foreground mb-3 text-2xl font-semibold'>
                 Congratulations! Time to Review 🚀
               </h2>
-              <p className='text-muted-foreground'>
+              <p className='text-muted-foreground text-md font-medium'>
                 You're all set. Review your selected topics, modules, and output
                 types before AI generates your full training package.
               </p>
