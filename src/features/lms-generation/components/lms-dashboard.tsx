@@ -88,7 +88,7 @@ export default function LmsDashboard() {
                 {workspaces.map((workspace) => (
                   <div
                     key={workspace.id}
-                    className='group relative cursor-pointer overflow-hidden bg-slate-100 p-4 transition-shadow hover:shadow-lg'
+                    className='group relative cursor-pointer overflow-hidden rounded-md border p-4 transition-shadow'
                   >
                     <div className='relative aspect-video w-full rounded-sm'>
                       <Image
