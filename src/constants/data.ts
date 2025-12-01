@@ -31,7 +31,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Courses',
-    url: '#',
+    url: '/dashboard/courses',
     icon: 'bookOpen',
     shortcut: ['c', 'c'],
     isActive: false,
@@ -39,7 +39,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Templates',
-    url: '#',
+    url: '/dashboard/templates',
     icon: 'fileText',
     shortcut: ['t', 't'],
     isActive: false,
