@@ -14,12 +14,52 @@ export type Product = {
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Home',
     url: '/dashboard/overview',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
     items: [] // Empty array as there are no child items for Dashboard
+  },
+  {
+    title: 'LMS Generation',
+    url: '/dashboard/lms-generation',
+    icon: 'bookOpen',
+    shortcut: ['l', 'g'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Workspaces',
+    url: '/dashboard/workspaces',
+    icon: 'settings',
+    shortcut: ['w', 'w'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Courses',
+    url: '/dashboard/courses',
+    icon: 'product',
+    shortcut: ['c', 'c'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Templates',
+    url: '/dashboard/templates',
+    icon: 'page',
+    shortcut: ['t', 't'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Help Center',
+    url: '/dashboard/help',
+    icon: 'help',
+    shortcut: ['h', 'h'],
+    isActive: false,
+    items: [] // No child items
   },
   {
     title: 'Product',
