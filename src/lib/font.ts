@@ -4,7 +4,8 @@ import {
   Instrument_Sans,
   Inter,
   Mulish,
-  Noto_Sans_Mono
+  Noto_Sans_Mono,
+  Plus_Jakarta_Sans
 } from 'next/font/google';
 
 import { cn } from '@/lib/utils';
@@ -39,11 +40,17 @@ const fontInter = Inter({
   variable: '--font-inter'
 });
 
+const fontPlusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta'
+});
+
 export const fontVariables = cn(
   fontSans.variable,
   fontMono.variable,
   fontInstrument.variable,
   fontNotoMono.variable,
   fontMullish.variable,
-  fontInter.variable
+  fontInter.variable,
+  fontPlusJakarta.variable
 );
