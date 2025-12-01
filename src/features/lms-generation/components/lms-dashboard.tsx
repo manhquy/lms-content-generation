@@ -2,20 +2,38 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Play, Users } from 'lucide-react';
+import LikeIcon from '@/components/ui/icon/like';
+import { BookOpen, ChevronUp, Folder, Star } from 'lucide-react';
 import Link from 'next/link';
-import PageContainer from '@/components/layout/page-container';
+import Image from 'next/image';
+import BrowserIcon from '@/components/ui/icon/browser';
+import StarIcon from '@/components/ui/icon/star';
 
 const workspaces = [
-  { id: '1', name: 'Clinical', icon: '🏥', color: 'bg-blue-100' },
-  { id: '2', name: 'Regulatory', icon: '📋', color: 'bg-green-100' },
-  { id: '3', name: 'Operational Training', icon: '⚙️', color: 'bg-purple-100' }
+  {
+    id: '1',
+    name: 'Clinical',
+    path: 'Workspace > Clinical',
+    icon: '📋'
+  },
+  {
+    id: '2',
+    name: 'Regulatory',
+    path: 'Workspace > Regulatory',
+    icon: '📋'
+  },
+  {
+    id: '3',
+    name: 'Operational Training',
+    path: 'Workspace > Operational Training',
+    icon: '📋'
+  }
 ];
 
 const myWorkspaces = [
-  { id: '1', name: 'Claims', letter: 'C', color: 'bg-orange-500' },
+  { id: '1', name: 'Claims', letter: 'C', color: 'bg-yellow-500' },
   { id: '2', name: 'Prior Auth', letter: 'P', color: 'bg-blue-500' },
-  { id: '3', name: 'Brokers', letter: 'B', color: 'bg-purple-500' }
+  { id: '3', name: 'Brokers', letter: 'B', color: 'bg-indigo-600' }
 ];
 
 const templates = [
@@ -33,74 +51,98 @@ const templates = [
   }
 ];
 
-export function LmsDashboard() {
+export default function LmsDashboard() {
   return (
-    <PageContainer>
-      <div className='space-y-6'>
+    <div className='bg-background min-h-screen p-8'>
+      <div className='space-y-8'>
         {/* Header */}
         <div className='flex items-center justify-between'>
           <div>
-            <h1 className='text-2xl font-bold'>Good Morning, Amy!</h1>
-            <p className='text-muted-foreground'>
+            <h1 className='text-foreground text-3xl font-bold'>
+              Good Morning, Amy!
+            </h1>
+            <p className='text-muted-foreground mt-1'>
               Quickly access your recent training, courses and workspaces
             </p>
           </div>
-          <Button variant='outline' className='text-muted-foreground'>
-            👍 Give Feedback
-          </Button>
+          <div className='text-primary flex items-center gap-2'>
+            <LikeIcon />
+            <span className='text-primary'>Give Feedback</span>
+          </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
           {/* Left Column */}
-          <div className='space-y-6 lg:col-span-2'>
+          <div className='space-y-8 lg:col-span-2'>
             {/* Recent Visited */}
             <div>
-              <div className='mb-4 flex items-center justify-between'>
-                <h2 className='text-lg font-semibold'>Recent Visited</h2>
-                <button className='text-muted-foreground text-sm'>^</button>
+              <div className='mb-6 flex items-center justify-between rounded-md border p-2'>
+                <h2 className='text-foreground text-sm font-semibold'>
+                  Recent Visited
+                </h2>
+                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-200 transition-colors'>
+                  <ChevronUp className='h-5 w-5' />
+                </button>
               </div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+              <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
                 {workspaces.map((workspace) => (
-                  <Card key={workspace.id} className='relative'>
-                    <CardContent className='p-4'>
-                      <div className='space-y-3'>
-                        <div className='text-2xl'>{workspace.icon}</div>
-                        <div>
-                          <h3 className='font-medium'>{workspace.name}</h3>
-                          <p className='text-muted-foreground text-sm'>
-                            Workspace • {workspace.name}
-                          </p>
-                        </div>
+                  <div
+                    key={workspace.id}
+                    className='group relative cursor-pointer overflow-hidden bg-slate-100 p-4 transition-shadow hover:shadow-lg'
+                  >
+                    <div className='relative aspect-video w-full rounded-sm'>
+                      <Image
+                        src='/image-1.png'
+                        alt={workspace.name}
+                        fill
+                        className='rounded-sm object-cover'
+                      />
+                    </div>
+                    <div className='flex w-full items-center gap-4 pt-4'>
+                      <div className='flex w-full items-center gap-2'>
+                        <BrowserIcon />
+                        <span className='text-sm font-semibold'>
+                          {workspace.name}
+                        </span>
                       </div>
-                    </CardContent>
-                    <button className='text-muted-foreground hover:text-foreground absolute top-3 right-3'>
-                      ⭐
-                    </button>
-                  </Card>
+                      <div className='flex shrink-0'>
+                        <StarIcon />
+                      </div>
+                    </div>
+                    <p className='pt-4 text-sm'>{workspace.path}</p>
+                  </div>
                 ))}
               </div>
             </div>
 
             {/* My Workspace */}
             <div>
-              <div className='mb-4 flex items-center justify-between'>
-                <h2 className='text-lg font-semibold'>My Workspace</h2>
-                <button className='text-muted-foreground text-sm'>^</button>
+              <div className='mb-6 flex items-center justify-between rounded-md border p-2'>
+                <h2 className='text-foreground text-sm font-semibold'>
+                  My Workspace
+                </h2>
+                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-200 transition-colors'>
+                  <ChevronUp className='h-5 w-5' />
+                </button>
               </div>
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 {myWorkspaces.map((workspace) => (
                   <div
                     key={workspace.id}
-                    className='flex items-center space-x-3'
+                    className='flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-slate-50'
                   >
                     <div
                       className={`h-12 w-12 rounded-lg ${workspace.color} flex items-center justify-center font-bold text-white`}
                     >
                       {workspace.letter}
                     </div>
-                    <div>
-                      <p className='text-muted-foreground text-sm'>Workspace</p>
-                      <h3 className='font-medium'>{workspace.name}</h3>
+                    <div className='min-w-0'>
+                      <p className='text-muted-foreground text-xs font-medium'>
+                        Workspace
+                      </p>
+                      <h3 className='text-foreground font-semibold'>
+                        {workspace.name}
+                      </h3>
                     </div>
                   </div>
                 ))}
@@ -111,62 +153,58 @@ export function LmsDashboard() {
           {/* Right Column */}
           <div className='space-y-6'>
             {/* Build High-Impact AI Training */}
-            <Card className='border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100'>
-              <CardHeader className='pb-3'>
-                <div className='mb-3 flex h-16 w-16 items-center justify-center rounded-lg bg-white'>
-                  <div className='grid grid-cols-3 gap-1'>
-                    {[...Array(9)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-2 w-2 rounded-sm ${i % 2 === 0 ? 'bg-purple-500' : 'bg-purple-300'}`}
-                      />
-                    ))}
-                  </div>
+            <div className='rounded-md border p-4'>
+              <div>
+                <div className='relative aspect-video w-full rounded-sm'>
+                  <Image
+                    src='/image-2.png'
+                    alt=''
+                    fill
+                    className='rounded-sm object-cover'
+                  />
                 </div>
-                <CardTitle className='text-lg'>
+                <div className='py-4 text-base'>
                   Build High-Impact AI Training Experiences
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </div>
+              </div>
+              <div>
                 <Link href='/dashboard/lms-generation/wizard'>
-                  <Button className='w-full bg-purple-600 hover:bg-purple-700'>
+                  <Button className='w-full bg-indigo-600 text-white hover:bg-indigo-700'>
                     Create New
                   </Button>
                 </Link>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Templates */}
             <div>
-              <h3 className='mb-4 text-lg font-semibold'>Templates</h3>
+              <div className='mb-4 text-sm font-semibold'>Templates</div>
               <div className='space-y-3'>
                 {templates.map((template, index) => (
-                  <Card
+                  <div
                     key={index}
-                    className='bg-gradient-to-r from-purple-50 to-purple-100'
+                    className='cursor-pointer rounded-lg border transition-colors hover:bg-slate-100'
                   >
-                    <CardContent className='p-4'>
-                      <div className='flex items-start space-x-3'>
-                        <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-purple-200'>
-                          <BookOpen className='h-4 w-4 text-purple-600' />
-                        </div>
+                    <div className='p-2'>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-200'></div>
                         <div className='min-w-0 flex-1'>
-                          <h4 className='text-sm font-medium'>
+                          <h4 className='text-foreground text-sm font-semibold'>
                             {template.name}
                           </h4>
-                          <p className='text-muted-foreground text-xs'>
+                          <p className='text-muted-foreground mt-1 text-xs'>
                             {template.description}
                           </p>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }

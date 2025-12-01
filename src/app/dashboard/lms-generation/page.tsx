@@ -1,4 +1,4 @@
-import { LmsDashboard } from '@/features/lms-generation/components/lms-dashboard';
+import LmsDashboard from '@/features/lms-generation/components/lms-dashboard';
 
 export const metadata = {
   title: 'LMS Content Generation - Dashboard'
