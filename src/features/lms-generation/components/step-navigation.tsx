@@ -47,7 +47,7 @@ export function StepNavigation({
                   ? 'bg-primary text-primary-foreground'
                   : isStepCompleted(step.number)
                     ? 'bg-green-500 text-white'
-                    : 'bg-muted text-muted-foreground border-muted border-2'
+                    : 'border-foreground border bg-white'
               )}
             >
               {isStepCompleted(step.number) ? (

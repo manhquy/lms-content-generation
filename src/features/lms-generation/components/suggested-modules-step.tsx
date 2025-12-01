@@ -142,13 +142,13 @@ export function SuggestedModulesStep({
         <Button
           variant='link'
           onClick={handleAddCustomModules}
-          className='text-primary px-0 text-sm font-medium'
+          className='text-primary mb-0 px-0 text-sm font-medium has-[>svg]:px-0'
         >
           <Plus className='mr-2 h-4 w-4' />
           Add Custom Modules
         </Button>
 
-        <div className='flex flex-col gap-4 pt-8'>
+        <div className='flex flex-col gap-4 pt-2 pb-8'>
           <Button
             onClick={onNext}
             className='bg-primary hover:bg-primary/90 px-8'
