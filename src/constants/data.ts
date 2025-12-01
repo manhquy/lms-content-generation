@@ -15,88 +15,43 @@ export type Product = {
 export const navItems: NavItem[] = [
   {
     title: 'Home',
-    url: '/dashboard/overview',
-    icon: 'dashboard',
+    url: '/dashboard',
+    icon: 'home',
     isActive: false,
-    shortcut: ['d', 'd'],
-    items: [] // Empty array as there are no child items for Dashboard
-  },
-  {
-    title: 'LMS Generation',
-    url: '/dashboard/lms-generation',
-    icon: 'bookOpen',
-    shortcut: ['l', 'g'],
-    isActive: false,
-    items: [] // No child items
+    shortcut: ['h', 'h'],
+    items: []
   },
   {
     title: 'Workspaces',
-    url: '/dashboard/workspaces',
-    icon: 'settings',
+    url: '#',
+    icon: 'folderKanban',
     shortcut: ['w', 'w'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Courses',
     url: '/dashboard/courses',
-    icon: 'product',
+    icon: 'bookOpen',
     shortcut: ['c', 'c'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Templates',
     url: '/dashboard/templates',
-    icon: 'page',
+    icon: 'fileText',
     shortcut: ['t', 't'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Help Center',
     url: '/dashboard/help',
-    icon: 'help',
-    shortcut: ['h', 'h'],
+    icon: 'helpCircle',
+    shortcut: ['?', '?'],
     isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Product',
-    url: '/dashboard/product',
-    icon: 'product',
-    shortcut: ['p', 'p'],
-    isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'billing',
-    isActive: true,
-
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
-        icon: 'userPen',
-        shortcut: ['m', 'm']
-      },
-      {
-        title: 'Login',
-        shortcut: ['l', 'l'],
-        url: '/',
-        icon: 'login'
-      }
-    ]
-  },
-  {
-    title: 'Kanban',
-    url: '/dashboard/kanban',
-    icon: 'kanban',
-    shortcut: ['k', 'k'],
-    isActive: false,
-    items: [] // No child items
+    items: []
   }
 ];
 

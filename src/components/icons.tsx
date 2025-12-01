@@ -1,7 +1,6 @@
 import {
   IconAlertTriangle,
   IconArrowRight,
-  IconBook,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
@@ -31,7 +30,12 @@ import {
   IconUserX,
   IconX,
   IconLayoutKanban,
-  IconBrandGithub
+  IconBrandGithub,
+  IconHome,
+  IconBook,
+  IconFolder
+  // IconFolderKanban,
+  // IconBookOpen
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -68,5 +72,9 @@ export const Icons = {
   github: IconBrandGithub,
   twitter: IconBrandTwitter,
   check: IconCheck,
-  bookOpen: IconBook
+  home: IconHome,
+  folderKanban: IconFolder,
+  bookOpen: IconBook,
+  fileText: IconFileText,
+  helpCircle: IconHelpCircle
 };

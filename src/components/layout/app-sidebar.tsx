@@ -4,6 +4,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +39,10 @@ import {
   IconCreditCard,
   IconLogout,
   IconPhotoUp,
-  IconUserCircle
+  IconUserCircle,
+  IconSearch,
+  IconSparkles,
+  IconPlus
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -46,13 +50,13 @@ import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
 export const company = {
-  name: 'Acme Inc',
+  name: 'Prior Auth',
   logo: IconPhotoUp,
   plan: 'Enterprise'
 };
 
 const tenants = [
-  { id: '1', name: 'Acme Inc' },
+  { id: '1', name: 'Prior Auth' },
   { id: '2', name: 'Beta Corp' },
   { id: '3', name: 'Gamma Ltd' }
 ];
@@ -80,10 +84,15 @@ export default function AppSidebar() {
           defaultTenant={activeTenant}
           onTenantSwitch={handleSwitchTenant}
         />
+        <div className='px-2 py-2'>
+          <div className='relative'>
+            <IconSearch className='text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2' />
+            <Input placeholder='Search...' className='h-9 pl-8' />
+          </div>
+        </div>
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
           <SidebarMenu>
             {navItems.map((item) => {
               const Icon = item.icon ? Icons[item.icon] : Icons.logo;
@@ -140,8 +149,32 @@ export default function AppSidebar() {
             })}
           </SidebarMenu>
         </SidebarGroup>
+        <SidebarGroup>
+          <div className='flex items-center justify-between px-2'>
+            <SidebarGroupLabel>Add Items</SidebarGroupLabel>
+            <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-md'>
+              <IconPlus className='h-4 w-4' />
+            </button>
+          </div>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <div className='bg-primary/10 mx-2 mb-4 rounded-lg p-4'>
+          <div className='mb-2 flex items-start justify-between'>
+            <h3 className='text-sm font-semibold'>AI Assist</h3>
+          </div>
+          <p className='text-muted-foreground mb-3 text-xs'>
+            AI Assist simplifies content creation with fast AI-powered
+            suggestions and improvements.
+          </p>
+          <div className='bg-muted mb-3 h-1 w-full overflow-hidden rounded-full'>
+            <div className='bg-primary h-full w-3/4'></div>
+          </div>
+          <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium'>
+            <IconSparkles className='h-4 w-4' />
+            AI Assist
+          </button>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
