@@ -53,25 +53,25 @@ const templates = [
 
 export default function LmsDashboard() {
   return (
-    <div className='bg-background min-h-screen'>
+    <div className='bg-background min-h-screen w-full'>
       <div className='space-y-8'>
         {/* Header */}
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between border-b px-8 py-2'>
           <div>
-            <h1 className='text-foreground text-3xl font-bold'>
+            <h1 className='text-foreground text-lg font-bold'>
               Good Morning, Amy!
             </h1>
-            <p className='text-muted-foreground mt-1'>
+            <p className='text-foreground mt-1 text-sm'>
               Quickly access your recent training, courses and workspaces
             </p>
           </div>
           <div className='text-primary flex items-center gap-2'>
             <LikeIcon />
-            <span className='text-primary'>Give Feedback</span>
+            <span className='text-sm text-[#2D286B]'>Give Feedback</span>
           </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
+        <div className='mx-8 grid grid-cols-1 gap-8 lg:grid-cols-3'>
           {/* Left Column */}
           <div className='space-y-8 lg:col-span-2'>
             {/* Recent Visited */}
@@ -169,7 +169,7 @@ export default function LmsDashboard() {
               </div>
               <div>
                 <Link href='/dashboard/lms-generation/wizard'>
-                  <Button className='w-full bg-indigo-600 text-white hover:bg-indigo-700'>
+                  <Button className='bg-primary text-primary-foreground hover:bg-primary/90 w-full'>
                     Create New
                   </Button>
                 </Link>

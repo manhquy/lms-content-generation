@@ -168,7 +168,7 @@ export default function AppSidebar() {
               'linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(360deg, rgba(91, 81, 213, 0.05) 0%, rgba(255, 255, 255, 0) 100%)'
           }}
         >
-          <div className='mb-2 flex items-start justify-between'>
+          <div className='mb-3.5 flex items-start justify-between'>
             <h3 className='text-sm font-semibold'>AI Assist</h3>
           </div>
           <p className='text-muted-foreground mb-3 text-xs'>

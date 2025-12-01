@@ -140,22 +140,22 @@ export function LmsGenerationWizard() {
       <div className='w-full space-y-4'>
         {/* Header with greeting and navigation */}
         <div className='space-y-4'>
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between border-b px-8 py-2'>
             <div>
-              <h1 className='text-foreground text-3xl font-bold'>
+              <h1 className='text-foreground text-lg font-bold'>
                 Good Morning, Amy!
               </h1>
-              <p className='text-muted-foreground mt-1'>
+              <p className='text-foreground mt-1 text-sm'>
                 Quickly access your recent training, courses and workspaces
               </p>
             </div>
             <div className='text-primary flex items-center gap-2'>
               <LikeIcon />
-              <span className='text-primary'>Give Feedback</span>
+              <span className='text-sm text-[#2D286B]'>Give Feedback</span>
             </div>
           </div>
         </div>
-        <div className='flex w-full flex-row justify-between'>
+        <div className='mx-8 flex w-full flex-row justify-between'>
           <div className='flex flex-col gap-6'>
             {/* Step Navigation */}
             <StepNavigation
@@ -166,8 +166,12 @@ export function LmsGenerationWizard() {
             <div className='flex-1'>{renderCurrentStep()}</div>
           </div>
           {/* Right Sidebar - Video Preview */}
-          <div className='-mr-4 h-[790px]'>
-            <img src='/preview.png' alt='' className='h-[790px] object-cover' />
+          <div className='h-[790px]'>
+            <img
+              src='/preview.png'
+              alt=''
+              className='h-[790px] object-cover object-left'
+            />
           </div>
         </div>
       </div>
