@@ -31,10 +31,7 @@ import {
   IconUserX,
   IconX,
   IconLayoutKanban,
-  IconBrandGithub,
-  IconHome,
-  IconBook,
-  IconFolder
+  IconBrandGithub
   // IconFolderKanban,
   // IconBookOpen
 } from '@tabler/icons-react';
@@ -42,7 +39,8 @@ import {
   AppWindowMacIcon,
   BookOpenTextIcon,
   HouseIcon,
-  MessageCircleQuestion
+  Settings,
+  LucideMessageCircleQuestion
 } from 'lucide-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -64,7 +62,7 @@ export const Icons = {
   userPen: IconUserEdit,
   user2: IconUserCircle,
   media: IconPhoto,
-  settings: IconSettings,
+  settings: Settings,
   billing: IconCreditCard,
   ellipsis: IconDotsVertical,
   add: IconPlus,
