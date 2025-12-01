@@ -63,13 +63,13 @@ const videoScripts = [
     id: 1,
     timestamp: '0:01',
     text: 'Read this script in a calm, professional narrator tone, suitable for a healthcare training video',
-    thumbnail: '/assets/avatar1.jpg'
+    thumbnail: '/stock-1.jpg'
   },
   {
     id: 2,
     timestamp: '1:24',
     text: 'Open your laptop as if starting a work session, and while doing that, read this line in a warm, confident voice',
-    thumbnail: '/assets/avatar2.jpg'
+    thumbnail: '/stock-6.png'
   }
 ];
 
@@ -150,45 +150,9 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
             {/* Video Player */}
             <div>
               <div className='relative aspect-video overflow-hidden rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300'>
-                {/* Simulated video player */}
-                <div className='absolute inset-0 flex items-center justify-center'>
-                  <img
-                    src='/assets/video-placeholder.jpg'
-                    alt='Video'
-                    className='h-full w-full object-cover'
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="450"%3E%3Crect fill="%23E5E7EB" width="800" height="450"/%3E%3C/svg%3E';
-                    }}
-                  />
-                </div>
                 {/* Video Controls */}
-                <div className='absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-4'>
-                  <div className='mb-2 h-1 w-full rounded-full bg-white/30'>
-                    <div className='h-full w-1/3 rounded-full bg-white'></div>
-                  </div>
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-3'>
-                      <button className='text-white hover:text-white/80'>
-                        <IconPlayerPlay className='h-6 w-6' />
-                      </button>
-                      <button className='text-white hover:text-white/80'>
-                        <IconVolume className='h-5 w-5' />
-                      </button>
-                      <span className='text-xs text-white'>0:00 / 5:30</span>
-                    </div>
-                    <div className='flex items-center gap-3'>
-                      <button className='text-white hover:text-white/80'>
-                        <span className='text-xs'>CC</span>
-                      </button>
-                      <button className='text-white hover:text-white/80'>
-                        <IconSettings className='h-5 w-5' />
-                      </button>
-                      <button className='text-white hover:text-white/80'>
-                        <IconMaximize className='h-5 w-5' />
-                      </button>
-                    </div>
-                  </div>
+                <div className=''>
+                  <video src='/gettyimages.mp4' controls />
                 </div>
               </div>
             </div>
@@ -311,7 +275,7 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
                       >
                         <div className='h-20 w-32 overflow-hidden rounded-lg border bg-gradient-to-br from-gray-200 to-gray-300'>
                           <img
-                            src={`/assets/avatar${idx}.jpg`}
+                            src={`/stock-${idx}.jpg`}
                             alt={`Avatar ${idx}`}
                             className='h-full w-full object-cover'
                             onError={(e) => {
