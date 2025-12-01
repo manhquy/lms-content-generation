@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FormData } from './lms-generation-wizard';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function TrainingOutputsStep({
     'videos'
   ]);
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
 
   const handleOutputToggle = (outputId: string) => {
     let updated;
@@ -58,8 +60,7 @@ export function TrainingOutputsStep({
 
   const handleReviewContent = () => {
     setShowModal(false);
-    // Navigate to review page or perform action
-    console.log('Review content');
+    router.push('/dashboard/module');
   };
 
   return (
@@ -70,7 +71,7 @@ export function TrainingOutputsStep({
             <h1 className='text-foreground mb-2 text-2xl font-semibold'>
               Choose Your Training Outputs
             </h1>
-            <p className='text-muted-foreground text-md font-medium'>
+            <p className='text-md text-muted-foreground font-medium'>
               Select the content formats required for your program. AI will
               produce each deliverable automatically.
             </p>
@@ -132,7 +133,7 @@ export function TrainingOutputsStep({
               <h2 className='text-foreground mb-3 text-2xl font-semibold'>
                 Congratulations! Time to Review 🚀
               </h2>
-              <p className='text-muted-foreground text-md font-medium'>
+              <p className='text-md text-muted-foreground font-medium'>
                 You're all set. Review your selected topics, modules, and output
                 types before AI generates your full training package.
               </p>

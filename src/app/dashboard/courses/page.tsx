@@ -1,3 +1,5 @@
+'use client';
+
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,6 +12,7 @@ import {
 import LikeIcon from '@/components/ui/icon/like';
 import { Input } from '@/components/ui/input';
 import { IconSearch, IconSparkles, IconX } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 
 const courses = [
   {
@@ -79,6 +82,12 @@ const courses = [
 ];
 
 export default function CoursesPage() {
+  const router = useRouter();
+
+  const handleViewCourse = (courseId: number) => {
+    router.push('/dashboard/module');
+  };
+
   return (
     <PageContainer scrollable>
       <div className='w-full space-y-4'>
@@ -138,7 +147,11 @@ export default function CoursesPage() {
                     </div>
                   </div>
                   <div className='pt-4'>
-                    <Button className='w-full' variant='default'>
+                    <Button
+                      className='w-full'
+                      variant='default'
+                      onClick={() => handleViewCourse(course.id)}
+                    >
                       View Course
                     </Button>
                   </div>
