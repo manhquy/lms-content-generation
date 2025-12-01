@@ -53,7 +53,7 @@ const templates = [
 
 export default function LmsDashboard() {
   return (
-    <div className='bg-background min-h-screen p-8'>
+    <div className='bg-background min-h-screen'>
       <div className='space-y-8'>
         {/* Header */}
         <div className='flex items-center justify-between'>
