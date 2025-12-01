@@ -40,7 +40,7 @@ export const navItems: NavItem[] = [
   {
     title: 'Templates',
     url: '/dashboard/templates',
-    icon: 'fileText',
+    icon: 'settings',
     shortcut: ['t', 't'],
     isActive: false,
     items: []

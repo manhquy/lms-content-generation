@@ -109,7 +109,7 @@ export default function AppSidebar() {
                         tooltip={item.title}
                         isActive={pathname === item.url}
                       >
-                        {item.icon && <Icon />}
+                        {item.icon && <Icon size={20} className='!h-5 !w-5' />}
                         <span>{item.title}</span>
                         <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                       </SidebarMenuButton>
@@ -140,7 +140,7 @@ export default function AppSidebar() {
                     isActive={pathname === item.url}
                   >
                     <Link href={item.url}>
-                      <Icon />
+                      <Icon size={20} className='!h-5 !w-5' />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
