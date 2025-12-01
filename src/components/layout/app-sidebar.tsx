@@ -150,14 +150,16 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <div className='mt-6 flex items-center justify-between rounded-md border p-2'>
-            <SidebarGroupLabel className='h-auto pl-1 text-sm font-medium'>
-              Add Items
-            </SidebarGroupLabel>
-            <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-sm'>
-              <IconPlus className='h-4 w-4' />
-            </button>
-          </div>
+          <Link href='/dashboard/lms-generation/wizard'>
+            <div className='hover:bg-accent mt-6 flex cursor-pointer items-center justify-between rounded-md border p-2 transition-colors'>
+              <SidebarGroupLabel className='h-auto pl-1 text-sm font-medium'>
+                Add Items
+              </SidebarGroupLabel>
+              <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-sm'>
+                <IconPlus className='h-4 w-4' />
+              </button>
+            </div>
+          </Link>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className='mb-20'>
