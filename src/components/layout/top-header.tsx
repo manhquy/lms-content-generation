@@ -10,14 +10,15 @@ import {
   HelpCircle
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function TopHeader() {
   return (
     <header className='bg-background mx-6 flex h-14 items-center justify-between border-b'>
       {/* Left side - Logo */}
-      <div className='flex items-center gap-2'>
+      <Link href='/' className='flex items-center gap-2'>
         <Image src='/SimplifyXLogo.svg' alt='Logo' width={98} height={23} />
-      </div>
+      </Link>
 
       {/* Right side - Action Icons */}
       <div className='flex items-center gap-3'>

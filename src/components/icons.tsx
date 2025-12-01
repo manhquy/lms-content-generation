@@ -1,3 +1,4 @@
+import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import {
   IconAlertTriangle,
   IconArrowRight,
@@ -30,13 +31,17 @@ import {
   IconUserX,
   IconX,
   IconLayoutKanban,
-  IconBrandGithub,
-  IconHome,
-  IconBook,
-  IconFolder
+  IconBrandGithub
   // IconFolderKanban,
   // IconBookOpen
 } from '@tabler/icons-react';
+import {
+  AppWindowMacIcon,
+  BookOpenTextIcon,
+  HouseIcon,
+  Settings,
+  LucideMessageCircleQuestion
+} from 'lucide-react';
 
 export type Icon = React.ComponentType<IconProps>;
 
@@ -57,7 +62,7 @@ export const Icons = {
   userPen: IconUserEdit,
   user2: IconUserCircle,
   media: IconPhoto,
-  settings: IconSettings,
+  settings: Settings,
   billing: IconCreditCard,
   ellipsis: IconDotsVertical,
   add: IconPlus,
@@ -72,9 +77,9 @@ export const Icons = {
   github: IconBrandGithub,
   twitter: IconBrandTwitter,
   check: IconCheck,
-  home: IconHome,
-  folderKanban: IconFolder,
-  bookOpen: IconBook,
+  home: HouseIcon,
+  folderKanban: AppWindowMacIcon,
+  bookOpen: BookOpenTextIcon,
   fileText: IconFileText,
-  helpCircle: IconHelpCircle
+  helpCircle: QuestionMarkCircledIcon
 };
