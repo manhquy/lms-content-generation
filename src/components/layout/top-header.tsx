@@ -20,24 +20,24 @@ export default function TopHeader() {
       </div>
 
       {/* Right side - Action Icons */}
-      <div className='flex items-center gap-1'>
+      <div className='flex items-center gap-3'>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <Bell className='h-[18px] w-[18px]' />
+          <Bell size={24} className='!h-5 !w-5' />
         </Button>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <Mail className='h-[18px] w-[18px]' />
+          <Mail size={24} className='!h-5 !w-5' />
         </Button>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <UserCircle className='h-[18px] w-[18px]' />
+          <UserCircle size={24} className='!h-5 !w-5' />
         </Button>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <Cloud className='h-[18px] w-[18px]' />
+          <Cloud size={24} className='!h-5 !w-5' />
         </Button>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <Search className='h-[18px] w-[18px]' />
+          <Search size={24} className='!h-5 !w-5' />
         </Button>
         <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <HelpCircle className='h-[18px] w-[18px]' />
+          <HelpCircle size={24} className='!h-5 !w-5' />
         </Button>
       </div>
     </header>
