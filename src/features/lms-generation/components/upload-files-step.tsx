@@ -4,13 +4,21 @@ import { Button } from '@/components/ui/button';
 import { FormData } from './lms-generation-wizard';
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Upload, X, FileText } from 'lucide-react';
+import { Upload, X, FileText, Pause } from 'lucide-react';
 import Image from 'next/image';
+import { Progress } from '@/components/ui/progress';
+
 interface UploadFilesStepProps {
   formData: FormData;
   onUpdate: (updates: Partial<FormData>) => void;
   onNext: () => void;
   onBack: () => void;
+}
+
+interface UploadingFile {
+  file: File;
+  progress: number;
+  isPaused: boolean;
 }
 
 export function UploadFilesStep({
@@ -20,6 +28,7 @@ export function UploadFilesStep({
   onBack
 }: UploadFilesStepProps) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -47,8 +56,72 @@ export function UploadFilesStep({
   };
 
   const addFiles = (newFiles: File[]) => {
-    const updatedFiles = [...formData.uploadedFiles, ...newFiles];
-    onUpdate({ uploadedFiles: updatedFiles });
+    // Simulate upload progress for each file
+    newFiles.forEach((file) => {
+      const uploadingFile: UploadingFile = {
+        file,
+        progress: 0,
+        isPaused: false
+      };
+
+      setUploadingFiles((prev) => [...prev, uploadingFile]);
+
+      // Simulate upload progress
+      simulateUpload(file);
+    });
+  };
+
+  const simulateUpload = (file: File) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+
+      setUploadingFiles((prev) =>
+        prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
+      );
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        // Move to uploaded files after completion
+        setTimeout(() => {
+          const updatedFiles = [...formData.uploadedFiles, file];
+          onUpdate({ uploadedFiles: updatedFiles });
+          setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
+        }, 500);
+      }
+    }, 300);
+  };
+
+  const togglePause = (file: File) => {
+    setUploadingFiles((prev) =>
+      prev.map((uf) =>
+        uf.file === file ? { ...uf, isPaused: !uf.isPaused } : uf
+      )
+    );
+  };
+
+  const cancelUpload = (file: File) => {
+    setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    if (extension === 'zip') {
+      return (
+        <Image
+          src='/zip.png'
+          alt='ZIP'
+          width={32}
+          height={32}
+          className='h-8 w-8'
+        />
+      );
+    }
+    return (
+      <div className='flex h-8 w-8 items-center justify-center rounded bg-orange-100'>
+        <FileText className='h-4 w-4 text-orange-600' />
+      </div>
+    );
   };
 
   const removeFile = (index: number) => {
@@ -85,8 +158,10 @@ export function UploadFilesStep({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            'rounded-lg border-2 border-dashed p-4 text-center transition-colors',
-            isDragOver ? 'border-primary bg-primary/5' : 'border-primary'
+            'rounded-lg border-2 p-4 text-center transition-colors',
+            isDragOver
+              ? 'border-primary bg-primary/20 border'
+              : 'border-primary border-dashed'
           )}
         >
           <div className='flex flex-col items-center space-y-4'>
@@ -120,6 +195,52 @@ export function UploadFilesStep({
           />
         </div>
 
+        {/* Uploading Files Progress */}
+        {uploadingFiles.length > 0 && (
+          <div className='space-y-3'>
+            {uploadingFiles.map((uploadingFile, index) => {
+              const remainingTime = Math.ceil(
+                ((100 - uploadingFile.progress) / 5) * 0.3
+              );
+              return (
+                <div
+                  key={index}
+                  className='bg-card space-y-3 rounded-lg border p-4'
+                >
+                  <div className='flex items-start justify-between'>
+                    <div>
+                      <p className='text-sm font-medium'>Uploading...</p>
+                      <p className='text-muted-foreground text-xs'>
+                        {uploadingFile.progress}% • {remainingTime} seconds
+                        remaining
+                      </p>
+                    </div>
+                    <div className='flex items-center space-x-2'>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => togglePause(uploadingFile.file)}
+                        className='h-8 w-8 rounded-full p-0'
+                      >
+                        <Pause className='h-4 w-4' />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => cancelUpload(uploadingFile.file)}
+                        className='h-8 w-8 rounded-full bg-red-100 p-0 hover:bg-red-200'
+                      >
+                        <X className='h-4 w-4 text-red-600' />
+                      </Button>
+                    </div>
+                  </div>
+                  <Progress value={uploadingFile.progress} className='h-2' />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {/* Uploaded Files List */}
         {formData.uploadedFiles.length > 0 && (
           <div className='space-y-3'>
@@ -131,9 +252,7 @@ export function UploadFilesStep({
                   className='bg-muted/50 flex items-center justify-between rounded-lg p-3'
                 >
                   <div className='flex items-center space-x-3'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded bg-orange-100'>
-                      <FileText className='h-4 w-4 text-orange-600' />
-                    </div>
+                    {getFileIcon(file.name)}
                     <div>
                       <p className='text-sm font-medium'>{file.name}</p>
                       <p className='text-muted-foreground text-xs'>

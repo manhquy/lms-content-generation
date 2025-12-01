@@ -50,47 +50,50 @@ export function SuggestedTopicsStep({
     <div className='max-w-2xl'>
       <div className='space-y-6'>
         <div>
-          <h1 className='mb-2 text-2xl font-bold'>Suggested Topics</h1>
-          <p className=''>
+          <h1 className='text-foreground mb-2 text-3xl font-bold'>
+            Suggested Topics
+          </h1>
+          <p className='text-muted-foreground'>
             Here are the topics AI found in your document. Add or adjust before
             moving forward.
           </p>
         </div>
 
-        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+        <div className='flex flex-wrap gap-3'>
           {topics.map((topic) => {
             const isSelected = formData.selectedTopics.includes(topic);
             return (
               <label
                 key={topic}
-                className='hover:bg-muted/50 flex cursor-pointer items-center space-x-3 rounded-full border p-3 transition-colors'
+                className='hover:bg-muted/50 border-primary flex cursor-pointer items-center space-x-2 rounded-full border px-4 py-2 transition-colors'
               >
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={(checked) =>
                     handleTopicToggle(topic, checked === true)
                   }
-                  className='h-5 w-5 rounded-full border border-gray-300 transition-colors data-[state=checked]:border-green-500 data-[state=checked]:bg-green-500'
+                  className='h-4 w-4 rounded-full border border-gray-300 transition-colors data-[state=checked]:border-green-500 data-[state=checked]:bg-green-500'
                 />
                 <span className='text-sm font-medium'>{topic}</span>
               </label>
             );
           })}
+
+          <Button
+            variant='outline'
+            onClick={handleAddTopics}
+            className='bg-primary/10 hover:bg-primary/5 border-primary text-primary rounded-full border px-4 py-2'
+          >
+            <div className='bg-primary rounded-full border p-1'>
+              <Plus className='size-2.5 text-white' />
+            </div>
+            Add Topics
+          </Button>
         </div>
 
-        <Button
-          variant='outline'
-          onClick={handleAddTopics}
-          className='hover:bg-primary/5 border- border-primary text-primary w-full rounded-full border-2'
-        >
-          <Plus className='mr-2 h-4 w-4' />
-          Add Topics
-        </Button>
-
-        <div className='flex flex-col justify-between gap-4 pt-8'>
+        <div className='flex flex-col gap-4 pt-8'>
           <Button
             onClick={onNext}
-            // disabled={!isValid}
             className='bg-primary hover:bg-primary/90 px-8'
           >
             Continue
