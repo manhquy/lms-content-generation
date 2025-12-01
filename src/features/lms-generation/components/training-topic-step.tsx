@@ -40,7 +40,7 @@ export function TrainingTopicStep({
       <div className='space-y-6'>
         <div>
           <h1 className='mb-2 text-2xl font-bold'>Training Topic</h1>
-          <p className='text-muted-foreground'>
+          <p className=''>
             Specify the training focus so AI can organize your materials and
             generate aligned content.
           </p>

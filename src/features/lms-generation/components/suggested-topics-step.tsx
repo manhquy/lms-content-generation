@@ -50,10 +50,8 @@ export function SuggestedTopicsStep({
     <div className='max-w-2xl'>
       <div className='space-y-6'>
         <div>
-          <h1 className='text-foreground mb-2 text-3xl font-bold'>
-            Suggested Topics
-          </h1>
-          <p className='text-muted-foreground'>
+          <h1 className='mb-2 text-2xl font-bold'>Suggested Topics</h1>
+          <p className=''>
             Here are the topics AI found in your document. Add or adjust before
             moving forward.
           </p>

@@ -5,7 +5,7 @@ import { FormData } from './lms-generation-wizard';
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Upload, X, FileText } from 'lucide-react';
-
+import Image from 'next/image';
 interface UploadFilesStepProps {
   formData: FormData;
   onUpdate: (updates: Partial<FormData>) => void;
@@ -72,10 +72,8 @@ export function UploadFilesStep({
     <div className='max-w-2xl'>
       <div className='space-y-6'>
         <div>
-          <h1 className='text-foreground mb-2 text-3xl font-bold'>
-            Upload Files
-          </h1>
-          <p className='text-muted-foreground'>
+          <h1 className='mb-2 text-2xl font-bold'>Upload Files</h1>
+          <p className=''>
             Add documents, PDFs, slides, or notes. AI will analyze them to
             create structured training content.
           </p>
@@ -87,17 +85,18 @@ export function UploadFilesStep({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            'rounded-lg border-2 border-dashed p-12 text-center transition-colors',
-            isDragOver
-              ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25'
+            'rounded-lg border-2 border-dashed p-4 text-center transition-colors',
+            isDragOver ? 'border-primary bg-primary/5' : 'border-primary'
           )}
         >
           <div className='flex flex-col items-center space-y-4'>
-            <div className='bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full'>
-              <Upload className='text-primary h-6 w-6' />
-            </div>
-
+            <Image
+              src='/upload.png'
+              alt=''
+              width={42}
+              height={42}
+              className='h-10 w-10 rounded-sm'
+            />
             <div className='space-y-2'>
               <p className='text-base font-medium'>Drag your file(s) here</p>
               <p className='text-muted-foreground text-sm'>OR</p>
@@ -156,15 +155,20 @@ export function UploadFilesStep({
           </div>
         )}
 
-        <div className='flex justify-between pt-8'>
-          <Button variant='ghost' onClick={onBack} className='px-8'>
-            Back
-          </Button>
+        <div className='flex flex-col justify-between gap-4 pt-8'>
           <Button
             onClick={onNext}
+            // disabled={!isValid}
             className='bg-primary hover:bg-primary/90 px-8'
           >
             Continue
+          </Button>
+          <Button
+            variant='ghost'
+            onClick={onBack}
+            className='bg-primary/30 hover:bg-primary/40 text-primary px-8'
+          >
+            Back
           </Button>
         </div>
       </div>
