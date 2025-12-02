@@ -150,10 +150,11 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
             {/* Video Player */}
             <div>
               <div className='relative aspect-video overflow-hidden rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300'>
-                {/* Video Controls */}
-                <div className=''>
-                  <video src='/gettyimages.mp4' controls />
-                </div>
+                <video
+                  src='/gettyimages.mp4'
+                  controls
+                  className='h-full w-full object-cover'
+                />
               </div>
             </div>
 

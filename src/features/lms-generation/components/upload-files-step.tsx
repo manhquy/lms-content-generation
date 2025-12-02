@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { Upload, X, FileText, Pause } from 'lucide-react';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
+import { useExtractFile } from '@/hooks/use-lms';
+import { useWorkspaceStore } from '@/stores/workspace-store';
 
 interface UploadFilesStepProps {
   formData: FormData;
@@ -29,7 +31,11 @@ export function UploadFilesStep({
 }: UploadFilesStepProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
+  const [isExtractingFile, setIsExtractingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addExtractedData } = useWorkspaceStore();
+
+  const { mutate: extractFile, isPending: isExtracting } = useExtractFile();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -72,24 +78,79 @@ export function UploadFilesStep({
   };
 
   const simulateUpload = (file: File) => {
+    const startTime = Date.now();
     let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
 
-      setUploadingFiles((prev) =>
-        prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
-      );
+    // If it's a zip file, call extract API immediately
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      setIsExtractingFile(file);
 
-      if (progress >= 100) {
-        clearInterval(interval);
-        // Move to uploaded files after completion
-        setTimeout(() => {
-          const updatedFiles = [...formData.uploadedFiles, file];
-          onUpdate({ uploadedFiles: updatedFiles });
-          setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
-        }, 500);
-      }
-    }, 300);
+      // Start progress animation
+      const progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        // Slow progress that will complete when API responds
+        progress = Math.min(80, Math.floor((elapsed / 100) * 2)); // Reaches 80% slowly
+
+        setUploadingFiles((prev) =>
+          prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
+        );
+      }, 100);
+
+      // Call extract API
+      extractFile(file, {
+        onSuccess: (data) => {
+          clearInterval(progressInterval);
+
+          // Complete progress animation
+          setUploadingFiles((prev) =>
+            prev.map((uf) => (uf.file === file ? { ...uf, progress: 100 } : uf))
+          );
+
+          // Store extracted data in Zustand
+          addExtractedData(data);
+
+          // Move to uploaded files
+          setTimeout(() => {
+            const updatedFiles = [...formData.uploadedFiles, file];
+            onUpdate({ uploadedFiles: updatedFiles });
+            setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
+            setIsExtractingFile(null);
+          }, 500);
+        },
+        onError: () => {
+          clearInterval(progressInterval);
+          // On error, still complete the upload but show error
+          setUploadingFiles((prev) =>
+            prev.map((uf) => (uf.file === file ? { ...uf, progress: 100 } : uf))
+          );
+
+          setTimeout(() => {
+            const updatedFiles = [...formData.uploadedFiles, file];
+            onUpdate({ uploadedFiles: updatedFiles });
+            setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
+            setIsExtractingFile(null);
+          }, 500);
+        }
+      });
+    } else {
+      // For non-zip files, just simulate normal upload
+      const interval = setInterval(() => {
+        progress += 5;
+
+        setUploadingFiles((prev) =>
+          prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
+        );
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            const updatedFiles = [...formData.uploadedFiles, file];
+            onUpdate({ uploadedFiles: updatedFiles });
+            setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
+          }, 500);
+        }
+      }, 300);
+    }
   };
 
   const togglePause = (file: File) => {
@@ -209,10 +270,15 @@ export function UploadFilesStep({
                 >
                   <div className='flex items-start justify-between'>
                     <div>
-                      <p className='text-sm font-medium'>Uploading...</p>
+                      <p className='text-sm font-medium'>
+                        {isExtractingFile === uploadingFile.file
+                          ? 'Extracting and analyzing...'
+                          : 'Uploading...'}
+                      </p>
                       <p className='text-muted-foreground text-xs'>
-                        {uploadingFile.progress}% • {remainingTime} seconds
-                        remaining
+                        {uploadingFile.progress}%
+                        {isExtractingFile !== uploadingFile.file &&
+                          ` • ${remainingTime} seconds remaining`}
                       </p>
                     </div>
                     <div className='flex items-center space-x-2'>

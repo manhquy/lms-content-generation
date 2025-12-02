@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { FormData } from './lms-generation-wizard';
 import { GripVertical, Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useWorkspaceStore } from '@/stores/workspace-store';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface SuggestedModulesStepProps {
   formData: FormData;
@@ -22,29 +30,16 @@ interface SuggestedModulesStepProps {
   onBack: () => void;
 }
 
-interface ModuleGroup {
-  title: string;
-  modules: string[];
+interface ModuleItem {
+  name: string;
 }
 
-const initialModuleGroups: ModuleGroup[] = [
-  {
-    title: 'Prior Authorization Fundamentals',
-    modules: [
-      'Overview of Prior Authorization',
-      'Purpose and Importance of PA',
-      'Situations Where PA Is Required'
-    ]
-  },
-  {
-    title: 'Intake & Triage Workflow',
-    modules: [
-      'Request Intake Methods',
-      'Case Creation and Data Capture',
-      'Routing and Prioritization Flow'
-    ]
-  }
-];
+interface ModuleGroup {
+  title: string;
+  modules: ModuleItem[];
+}
+
+// Remove hardcoded initial data - will be loaded from extract API
 
 export function SuggestedModulesStep({
   formData,
@@ -52,8 +47,35 @@ export function SuggestedModulesStep({
   onNext,
   onBack
 }: SuggestedModulesStepProps) {
-  const [moduleGroups, setModuleGroups] =
-    useState<ModuleGroup[]>(initialModuleGroups);
+  const { extractedData } = useWorkspaceStore();
+
+  // Initialize module groups from extracted data - only show selected topics
+  const getInitialModuleGroups = (): ModuleGroup[] => {
+    if (extractedData.length > 0 && formData.selectedTopics.length > 0) {
+      // Filter to only include topics that were selected in previous step
+      return extractedData
+        .filter((item) => formData.selectedTopics.includes(item.topic))
+        .map((item) => ({
+          title: item.topic,
+          modules: item.modules.map((moduleName) => ({
+            name: moduleName
+          }))
+        }));
+    }
+    return []; // Start empty if no extracted data or no selected topics
+  };
+
+  const [moduleGroups, setModuleGroups] = useState<ModuleGroup[]>(
+    getInitialModuleGroups()
+  );
+
+  // Update module groups when extracted data or selected topics change
+  useEffect(() => {
+    if (extractedData.length > 0 || formData.selectedTopics.length > 0) {
+      setModuleGroups(getInitialModuleGroups());
+    }
+  }, [extractedData, formData.selectedTopics]);
+
   const [draggedItem, setDraggedItem] = useState<{
     groupIndex: number;
     moduleIndex: number;
@@ -108,7 +130,7 @@ export function SuggestedModulesStep({
       open: true,
       groupIndex,
       moduleIndex,
-      value: module
+      value: module.name
     });
   };
 
@@ -116,8 +138,9 @@ export function SuggestedModulesStep({
     if (editDialog.groupIndex === -1 || editDialog.moduleIndex === -1) return;
 
     const newGroups = [...moduleGroups];
-    newGroups[editDialog.groupIndex].modules[editDialog.moduleIndex] =
-      editDialog.value;
+    newGroups[editDialog.groupIndex].modules[editDialog.moduleIndex] = {
+      name: editDialog.value
+    };
     setModuleGroups(newGroups);
     setEditDialog({ open: false, groupIndex: -1, moduleIndex: -1, value: '' });
   };
@@ -146,14 +169,18 @@ export function SuggestedModulesStep({
       (g) => g.title.toLowerCase() === addDialog.groupTitle.toLowerCase()
     );
 
+    const newModule: ModuleItem = {
+      name: addDialog.moduleName
+    };
+
     if (existingGroupIndex !== -1) {
       // Add to existing group
-      newGroups[existingGroupIndex].modules.push(addDialog.moduleName);
+      newGroups[existingGroupIndex].modules.push(newModule);
     } else {
       // Create new group
       newGroups.push({
         title: addDialog.groupTitle,
-        modules: [addDialog.moduleName]
+        modules: [newModule]
       });
     }
 
@@ -168,7 +195,7 @@ export function SuggestedModulesStep({
           <h1 className='text-foreground mb-2 text-2xl font-semibold'>
             Suggested Modules
           </h1>
-          <p className='text-muted-foreground text-md font-medium'>
+          <p className='text-md text-muted-foreground font-medium'>
             Based on your selected topics, AI has proposed structured modules.
             Confirm or adjust before moving ahead.
           </p>
@@ -195,7 +222,7 @@ export function SuggestedModulesStep({
                     </div>
                     <div className='flex w-full cursor-move flex-row items-center justify-between rounded-lg border transition-colors'>
                       <span className='p-2 pr-0 text-sm font-medium'>
-                        {module}
+                        {module.name}
                       </span>
                       <div className='flex items-center border-l'>
                         <Button
@@ -319,15 +346,24 @@ export function SuggestedModulesStep({
           </DialogHeader>
           <div className='space-y-4 py-4'>
             <div className='space-y-2'>
-              <Label htmlFor='group-title'>Group Title</Label>
-              <Input
-                id='group-title'
+              <Label htmlFor='group-title'>Topic Group</Label>
+              <Select
                 value={addDialog.groupTitle}
-                onChange={(e) =>
-                  setAddDialog({ ...addDialog, groupTitle: e.target.value })
+                onValueChange={(value) =>
+                  setAddDialog({ ...addDialog, groupTitle: value })
                 }
-                placeholder='Enter group title (new or existing)'
-              />
+              >
+                <SelectTrigger id='group-title'>
+                  <SelectValue placeholder='Select a topic' />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.selectedTopics.map((topic) => (
+                    <SelectItem key={topic} value={topic}>
+                      {topic}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className='space-y-2'>
               <Label htmlFor='new-module-name'>Module Name</Label>

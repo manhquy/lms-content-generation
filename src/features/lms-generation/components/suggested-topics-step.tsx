@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { FormData } from './lms-generation-wizard';
 import { Plus, X } from 'lucide-react';
+import { useWorkspaceStore } from '@/stores/workspace-store';
 
 interface SuggestedTopicsStepProps {
   formData: FormData;
@@ -21,19 +22,6 @@ interface SuggestedTopicsStepProps {
   onNext: () => void;
   onBack: () => void;
 }
-
-const topics = [
-  'Prior Authorization Fundamentals',
-  'Intake & Triage Workflow',
-  'Provider Submissions',
-  'Clinical Documentation',
-  'Submission Rules',
-  'Approvals',
-  'Denial Management',
-  'Appeals',
-  'Compliance',
-  'HIPAA Requirements'
-];
 
 export function SuggestedTopicsStep({
   formData,
@@ -43,7 +31,11 @@ export function SuggestedTopicsStep({
 }: SuggestedTopicsStepProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTopic, setNewTopic] = useState('');
-  const [customTopics, setCustomTopics] = useState<string[]>([]);
+  const [customTopics, setCustomTopics] = useState<string[]>([]); // Only user-added topics
+  const { extractedData } = useWorkspaceStore();
+
+  // Extract only topics from extracted data
+  const extractedTopics = extractedData.map((item) => item.topic);
 
   const handleTopicToggle = (topic: string, checked: boolean) => {
     let updatedTopics;
@@ -68,13 +60,18 @@ export function SuggestedTopicsStep({
   };
 
   const handleRemoveCustomTopic = (topicToRemove: string) => {
-    const updatedCustomTopics = customTopics.filter((t) => t !== topicToRemove);
-    setCustomTopics(updatedCustomTopics);
-    // Also remove from selected topics if it was selected
-    const updatedSelectedTopics = formData.selectedTopics.filter(
-      (t) => t !== topicToRemove
-    );
-    onUpdate({ selectedTopics: updatedSelectedTopics });
+    // Only allow removing custom topics, not extracted ones
+    if (!extractedTopics.includes(topicToRemove)) {
+      const updatedCustomTopics = customTopics.filter(
+        (t) => t !== topicToRemove
+      );
+      setCustomTopics(updatedCustomTopics);
+      // Also remove from selected topics if it was selected
+      const updatedSelectedTopics = formData.selectedTopics.filter(
+        (t) => t !== topicToRemove
+      );
+      onUpdate({ selectedTopics: updatedSelectedTopics });
+    }
   };
 
   const handleSaveCustomTopics = () => {
@@ -97,8 +94,8 @@ export function SuggestedTopicsStep({
     }
   };
 
-  // Combine default topics with custom topics
-  const allTopics = [...topics, ...customTopics];
+  // Combine extracted topics (from PDF) with custom topics (user-added)
+  const allTopics = [...extractedTopics, ...customTopics];
 
   return (
     <div className='max-w-2xl'>
@@ -108,14 +105,16 @@ export function SuggestedTopicsStep({
             Suggested Topics
           </h1>
           <p className='text-foreground text-md font-medium'>
-            Here are the topics AI found in your document. Add or adjust before
-            moving forward.
+            {extractedTopics.length > 0
+              ? `AI found ${extractedTopics.length} topic${extractedTopics.length > 1 ? 's' : ''} in your document. Add or adjust before moving forward.`
+              : 'Here are the topics AI found in your document. Add or adjust before moving forward.'}
           </p>
         </div>
 
         <div className='flex flex-wrap gap-3'>
           {allTopics.map((topic) => {
             const isSelected = formData.selectedTopics.includes(topic);
+            const isExtracted = extractedTopics.includes(topic);
             const isCustom = customTopics.includes(topic);
             return (
               <label
@@ -130,7 +129,8 @@ export function SuggestedTopicsStep({
                   className='h-4 w-4 rounded-full border border-gray-300 transition-colors data-[state=checked]:border-green-500 data-[state=checked]:bg-green-500'
                 />
                 <span className='text-sm font-medium'>{topic}</span>
-                {isCustom && (
+                {/* Only show remove button for custom topics, not extracted ones */}
+                {isCustom && !isExtracted && (
                   <button
                     type='button'
                     onClick={(e) => {
@@ -208,12 +208,12 @@ export function SuggestedTopicsStep({
 
             {customTopics.length > 0 && (
               <div className='space-y-2'>
-                <h4 className='text-sm font-medium'>Custom Topics:</h4>
+                <h4 className='text-sm font-medium'>Your Custom Topics:</h4>
                 <div className='flex flex-wrap gap-2'>
                   {customTopics.map((topic) => (
                     <div
                       key={topic}
-                      className='border-primary bg-primary/10 flex items-center gap-2 rounded-full border px-3 py-1.5'
+                      className='bg-primary/10 border-primary flex items-center gap-2 rounded-full border px-3 py-1.5'
                     >
                       <span className='text-sm'>{topic}</span>
                       <button

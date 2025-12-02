@@ -8,33 +8,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import BrowserIcon from '@/components/ui/icon/browser';
 import StarIcon from '@/components/ui/icon/star';
-
-const workspaces = [
-  {
-    id: '1',
-    name: 'Clinical',
-    path: 'Workspace > Clinical',
-    icon: '📋'
-  },
-  {
-    id: '2',
-    name: 'Regulatory',
-    path: 'Workspace > Regulatory',
-    icon: '📋'
-  },
-  {
-    id: '3',
-    name: 'Operational Training',
-    path: 'Workspace > Operational Training',
-    icon: '📋'
-  }
-];
-
-const myWorkspaces = [
-  { id: '1', name: 'Claims', letter: 'C', color: 'bg-yellow-500' },
-  { id: '2', name: 'Prior Auth', letter: 'P', color: 'bg-blue-500' },
-  { id: '3', name: 'Brokers', letter: 'B', color: 'bg-indigo-600' }
-];
+import { useWorkspaces } from '@/hooks/use-lms';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const templates = [
   {
@@ -52,6 +28,25 @@ const templates = [
 ];
 
 export default function LmsDashboard() {
+  const { data: user } = useGetMe();
+  const { data: workspaces, isLoading } = useWorkspaces(user?.id || '');
+
+  const getWorkspaceInitial = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
+  const getWorkspaceColor = (index: number) => {
+    const colors = [
+      'bg-yellow-500',
+      'bg-blue-500',
+      'bg-indigo-600',
+      'bg-green-500',
+      'bg-purple-500',
+      'bg-red-500'
+    ];
+    return colors[index % colors.length];
+  };
+
   return (
     <div className='bg-background min-h-screen w-full'>
       <div className='space-y-8'>
@@ -84,35 +79,57 @@ export default function LmsDashboard() {
                   <ChevronUp className='h-5 w-5' />
                 </button>
               </div>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
-                {workspaces.map((workspace) => (
-                  <div
-                    key={workspace.id}
-                    className='group relative cursor-pointer overflow-hidden rounded-md border p-4 transition-shadow'
-                  >
-                    <div className='relative aspect-video w-full rounded-sm'>
-                      <Image
-                        src='/image-1.png'
-                        alt={workspace.name}
-                        fill
-                        className='rounded-sm object-cover'
-                      />
-                    </div>
-                    <div className='flex w-full items-center gap-4 pt-4'>
-                      <div className='flex w-full items-center gap-2'>
-                        <BrowserIcon />
-                        <span className='text-sm font-semibold'>
-                          {workspace.name}
-                        </span>
+              {isLoading ? (
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className='rounded-md border p-4'>
+                      <Skeleton className='aspect-video w-full rounded-sm' />
+                      <div className='pt-4'>
+                        <Skeleton className='h-6 w-3/4' />
                       </div>
-                      <div className='flex shrink-0'>
-                        <StarIcon />
-                      </div>
+                      <Skeleton className='mt-2 h-4 w-full' />
                     </div>
-                    <p className='pt-4 text-sm'>{workspace.path}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : workspaces && workspaces.length > 0 ? (
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+                  {workspaces.slice(0, 3).map((workspace) => (
+                    <div
+                      key={workspace.id}
+                      className='group relative cursor-pointer overflow-hidden rounded-md border p-4 transition-shadow'
+                    >
+                      <div className='relative aspect-video w-full rounded-sm'>
+                        <Image
+                          src='/image-1.png'
+                          alt={workspace.name}
+                          fill
+                          className='rounded-sm object-cover'
+                        />
+                      </div>
+                      <div className='flex w-full items-center gap-4 pt-4'>
+                        <div className='flex w-full items-center gap-2'>
+                          <BrowserIcon />
+                          <span className='text-sm font-semibold'>
+                            {workspace.name}
+                          </span>
+                        </div>
+                        <div className='flex shrink-0'>
+                          <StarIcon />
+                        </div>
+                      </div>
+                      <p className='pt-4 text-sm'>
+                        Workspace &gt; {workspace.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className='flex min-h-[200px] items-center justify-center rounded-md border'>
+                  <p className='text-muted-foreground text-sm'>
+                    No workspaces found
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* My Workspace */}
@@ -125,28 +142,51 @@ export default function LmsDashboard() {
                   <ChevronUp className='h-5 w-5' />
                 </button>
               </div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-                {myWorkspaces.map((workspace) => (
-                  <div
-                    key={workspace.id}
-                    className='flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-slate-50'
-                  >
+              {isLoading ? (
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+                  {[...Array(3)].map((_, i) => (
                     <div
-                      className={`h-12 w-12 rounded-lg ${workspace.color} flex items-center justify-center font-bold text-white`}
+                      key={i}
+                      className='flex items-center gap-3 rounded-lg border p-3'
                     >
-                      {workspace.letter}
+                      <Skeleton className='h-12 w-12 rounded-lg' />
+                      <div className='flex-1'>
+                        <Skeleton className='h-4 w-16' />
+                        <Skeleton className='mt-1 h-5 w-24' />
+                      </div>
                     </div>
-                    <div className='min-w-0'>
-                      <p className='text-muted-foreground text-xs font-medium'>
-                        Workspace
-                      </p>
-                      <h3 className='text-foreground font-semibold'>
-                        {workspace.name}
-                      </h3>
+                  ))}
+                </div>
+              ) : workspaces && workspaces.length > 0 ? (
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+                  {workspaces.map((workspace, index) => (
+                    <div
+                      key={workspace.id}
+                      className='flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-slate-50'
+                    >
+                      <div
+                        className={`h-12 w-12 rounded-lg ${getWorkspaceColor(index)} flex items-center justify-center font-bold text-white`}
+                      >
+                        {getWorkspaceInitial(workspace.name)}
+                      </div>
+                      <div className='min-w-0'>
+                        <p className='text-muted-foreground text-xs font-medium'>
+                          Workspace
+                        </p>
+                        <h3 className='text-foreground font-semibold'>
+                          {workspace.name}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className='flex min-h-[100px] items-center justify-center rounded-md border'>
+                  <p className='text-muted-foreground text-sm'>
+                    No workspaces found
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -169,7 +209,7 @@ export default function LmsDashboard() {
               </div>
               <div>
                 <Link href='/dashboard/lms-generation/wizard'>
-                  <Button className='bg-primary text-primary-foreground hover:bg-primary/90 w-full'>
+                  <Button className='bg-primary hover:bg-primary/90 text-primary-foreground w-full'>
                     Create New
                   </Button>
                 </Link>

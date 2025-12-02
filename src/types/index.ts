@@ -1,5 +1,15 @@
 import { Icons } from '@/components/icons';
 
+// Auth types
+export type {
+  RegisterRequest,
+  LoginRequest,
+  RegisterResponse,
+  LoginResponse,
+  User,
+  DecodedToken
+} from './auth';
+
 export interface NavItem {
   title: string;
   url: string;

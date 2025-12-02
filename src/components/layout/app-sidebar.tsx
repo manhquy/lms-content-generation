@@ -32,6 +32,9 @@ import {
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { navItems } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { useWorkspaces } from '@/hooks/use-lms';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { useWorkspaceStore } from '@/stores/workspace-store';
 import {
   IconBell,
   IconChevronRight,
@@ -55,22 +58,38 @@ export const company = {
   plan: 'Enterprise'
 };
 
-const tenants = [
-  { id: '1', name: 'Prior Auth' },
-  { id: '2', name: 'Beta Corp' },
-  { id: '3', name: 'Gamma Ltd' }
-];
-
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
-  const { user } = {} as any;
+  const { data: user } = useGetMe();
   const router = useRouter();
-  const handleSwitchTenant = (_tenantId: string) => {
-    // Tenant switching functionality would be implemented here
+  const { data: workspaces, isLoading: isLoadingWorkspaces } = useWorkspaces(
+    user?.id || ''
+  );
+  const { selectedWorkspaceId, setSelectedWorkspaceId } = useWorkspaceStore();
+
+  // Convert workspaces to tenant format for OrgSwitcher
+  const tenants = React.useMemo(() => {
+    if (!workspaces) return [];
+    return workspaces.map((ws) => ({
+      id: ws.id,
+      name: ws.name
+    }));
+  }, [workspaces]);
+
+  // Set default workspace when data loads
+  React.useEffect(() => {
+    if (workspaces && workspaces.length > 0 && !selectedWorkspaceId) {
+      setSelectedWorkspaceId(workspaces[0].id);
+    }
+  }, [workspaces, selectedWorkspaceId]);
+
+  const handleSwitchTenant = (tenantId: string) => {
+    setSelectedWorkspaceId(tenantId);
   };
 
-  const activeTenant = tenants[0];
+  const activeTenant =
+    tenants.find((t) => t.id === selectedWorkspaceId) || tenants[0];
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
@@ -79,11 +98,21 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <OrgSwitcher
-          tenants={tenants}
-          defaultTenant={activeTenant}
-          onTenantSwitch={handleSwitchTenant}
-        />
+        {isLoadingWorkspaces ? (
+          <div className='px-3 py-2'>
+            <div className='bg-muted h-14 animate-pulse rounded-md' />
+          </div>
+        ) : tenants.length > 0 ? (
+          <OrgSwitcher
+            tenants={tenants}
+            defaultTenant={activeTenant}
+            onTenantSwitch={handleSwitchTenant}
+          />
+        ) : (
+          <div className='text-muted-foreground px-3 py-2 text-sm'>
+            No workspaces found
+          </div>
+        )}
         <div className='mb-6'>
           <div className='relative'>
             <IconSearch className='text-muted-foreground absolute top-1/2 left-2 h-5 w-5 -translate-y-1/2' />
@@ -109,7 +138,7 @@ export default function AppSidebar() {
                         tooltip={item.title}
                         isActive={pathname === item.url}
                       >
-                        {item.icon && <Icon size={20} className='!h-5 !w-5' />}
+                        {item.icon && <Icon size={20} className='h-5! w-5!' />}
                         <span>{item.title}</span>
                         <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                       </SidebarMenuButton>
@@ -140,7 +169,7 @@ export default function AppSidebar() {
                     isActive={pathname === item.url}
                   >
                     <Link href={item.url}>
-                      <Icon size={20} className='!h-5 !w-5' />
+                      <Icon size={20} className='h-5! w-5!' />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -155,7 +184,7 @@ export default function AppSidebar() {
               <SidebarGroupLabel className='h-auto pl-1 text-sm font-medium'>
                 Add Items
               </SidebarGroupLabel>
-              <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex h-6 w-6 items-center justify-center rounded-sm'>
+              <button className='bg-primary hover:bg-primary/90 text-primary-foreground flex h-6 w-6 items-center justify-center rounded-sm'>
                 <IconPlus className='h-4 w-4' />
               </button>
             </div>
@@ -180,7 +209,7 @@ export default function AppSidebar() {
           <div className='bg-muted mb-3 h-1 w-full overflow-hidden rounded-full'>
             <div className='bg-primary h-full w-3/4'></div>
           </div>
-          <button className='bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium'>
+          <button className='bg-primary hover:bg-primary/90 text-primary-foreground flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium'>
             <IconSparkles className='h-4 w-4' />
             AI Assist
           </button>

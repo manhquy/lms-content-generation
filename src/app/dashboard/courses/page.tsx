@@ -13,76 +13,22 @@ import LikeIcon from '@/components/ui/icon/like';
 import { Input } from '@/components/ui/input';
 import { IconSearch, IconSparkles, IconX } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-
-const courses = [
-  {
-    id: 1,
-    title: 'Prior Authorization',
-    description:
-      'A foundational course covering the end-to-end PA process, including...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 2,
-    title: 'Broker Training - Medicare',
-    description:
-      'Comprehensive training for Medicare brokers, covering enrollment rules...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 3,
-    title: 'Broker Training - Medicaid',
-    description:
-      'Training for Medicaid brokers focused on state-specific eligibility...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 4,
-    title: 'Claims 101',
-    description:
-      'A beginner-friendly course explaining the claims lifecycle...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 5,
-    title: 'Regulatory',
-    description:
-      'Overview of key healthcare regulations, including CMS, NCQA...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 6,
-    title: 'Compliance',
-    description:
-      'A core course on organizational compliance, covering privacy, fraud...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 7,
-    title: 'Provider Submissions',
-    description:
-      'Training on provider documentation and submission requirements...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  },
-  {
-    id: 8,
-    title: 'Understanding HIPAA',
-    description:
-      'A clear and practical guide to HIPAA rules—including PHI, privacy...',
-    category: 'Training',
-    image: '/assets/course-placeholder.jpg'
-  }
-];
+import { useCourses } from '@/hooks/use-lms';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useWorkspaceStore } from '@/stores/workspace-store';
 
 export default function CoursesPage() {
   const router = useRouter();
+  const { data: user } = useGetMe();
+  const { selectedWorkspaceId } = useWorkspaceStore();
+
+  const {
+    data: courses,
+    isLoading,
+    isError,
+    error
+  } = useCourses(selectedWorkspaceId || '', user?.id || '');
 
   const handleViewCourse = (courseId: number) => {
     router.push('/dashboard/module');
@@ -133,31 +79,67 @@ export default function CoursesPage() {
                 <IconX className='h-4 w-4' />
               </Button>
             </div>
-            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
-              {courses.map((course) => (
-                <div
-                  key={course.id}
-                  className='overflow-hidden rounded-md border p-4'
-                >
-                  <div className='h-32 rounded-sm bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950' />
-                  <div>
-                    <div className='py-4 font-semibold'>{course.title}</div>
-                    <div className='line-clamp-2 text-xs'>
-                      {course.description}
+            {isLoading ? (
+              <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className='overflow-hidden rounded-md border p-4'
+                  >
+                    <Skeleton className='h-32 w-full rounded-sm' />
+                    <div className='py-4'>
+                      <Skeleton className='h-6 w-3/4' />
+                    </div>
+                    <Skeleton className='h-8 w-full' />
+                    <Skeleton className='mt-2 h-8 w-full' />
+                    <div className='pt-4'>
+                      <Skeleton className='h-10 w-full' />
                     </div>
                   </div>
-                  <div className='pt-4'>
-                    <Button
-                      className='w-full'
-                      variant='default'
-                      onClick={() => handleViewCourse(course.id)}
-                    >
-                      View Course
-                    </Button>
+                ))}
+              </div>
+            ) : isError ? (
+              <div className='flex min-h-[400px] flex-col items-center justify-center'>
+                <p className='text-muted-foreground text-sm'>
+                  Failed to load courses. Please try again.
+                </p>
+                <p className='mt-2 text-xs text-red-500'>
+                  {error instanceof Error ? error.message : 'Unknown error'}
+                </p>
+              </div>
+            ) : !courses || courses.length === 0 ? (
+              <div className='flex min-h-[400px] flex-col items-center justify-center'>
+                <p className='text-muted-foreground text-sm'>
+                  No courses found. Create your first course to get started.
+                </p>
+              </div>
+            ) : (
+              <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className='overflow-hidden rounded-md border p-4'
+                  >
+                    <div className='h-32 rounded-sm bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950' />
+                    <div>
+                      <div className='py-4 font-semibold'>{course.name}</div>
+                      <div className='line-clamp-2 text-xs'>
+                        {course.description || 'No description available'}
+                      </div>
+                    </div>
+                    <div className='pt-4'>
+                      <Button
+                        className='w-full'
+                        variant='default'
+                        onClick={() => handleViewCourse(Number(course.id))}
+                      >
+                        View Course
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
