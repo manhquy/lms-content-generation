@@ -80,7 +80,7 @@ export default function LmsDashboard() {
                 <h2 className='text-foreground text-sm font-semibold'>
                   Recent Visited
                 </h2>
-                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-200 transition-colors'>
+                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-100 transition-colors'>
                   <ChevronUp className='h-5 w-5' />
                 </button>
               </div>
@@ -121,7 +121,7 @@ export default function LmsDashboard() {
                 <h2 className='text-foreground text-sm font-semibold'>
                   My Workspace
                 </h2>
-                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-200 transition-colors'>
+                <button className='text-muted-foreground hover:text-foreground rounded-xs bg-neutral-100 transition-colors'>
                   <ChevronUp className='h-5 w-5' />
                 </button>
               </div>

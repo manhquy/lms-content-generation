@@ -190,7 +190,7 @@ export default function TemplatesPage() {
               {templates.map((template) => (
                 <Card
                   key={template.id}
-                  className='overflow-hidden bg-white p-4'
+                  className='overflow-hidden bg-white p-4 shadow-none'
                 >
                   <CardHeader className='space-y-6 p-0'>
                     <div className='flex items-start justify-between'>
