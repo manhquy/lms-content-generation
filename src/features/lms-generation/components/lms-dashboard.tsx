@@ -11,6 +11,7 @@ import StarIcon from '@/components/ui/icon/star';
 import { useWorkspaces } from '@/hooks/use-lms';
 import { useGetMe } from '@/features/auth/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getGreeting } from '@/lib/utils';
 
 const templates = [
   {
@@ -54,7 +55,7 @@ export default function LmsDashboard() {
         <div className='flex items-center justify-between border-b px-8 py-2'>
           <div>
             <h1 className='text-foreground text-lg font-bold'>
-              Good Morning, Amy!
+              {getGreeting(user?.full_name)}
             </h1>
             <p className='text-foreground mt-1 text-sm'>
               Quickly access your recent training, courses and workspaces

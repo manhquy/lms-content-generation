@@ -46,6 +46,8 @@ import {
   UserRound
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { getGreeting } from '@/lib/utils';
 
 const modules = [
   { id: 1, title: 'Introduction to Prior Auth', label: 'Module 1' },
@@ -101,6 +103,7 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
 
   const [showRewriteMenu, setShowRewriteMenu] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const { data: user } = useGetMe();
 
   const handleTextSelection = () => {
     const selection = window.getSelection();
@@ -121,7 +124,7 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
           <div className='flex items-center justify-between border-b px-8 py-2'>
             <div>
               <h1 className='text-foreground text-lg font-bold'>
-                Good Morning, Amy!
+                {getGreeting(user?.full_name)}
               </h1>
               <p className='text-foreground mt-1 text-sm'>
                 Quickly access your recent training, courses and workspaces

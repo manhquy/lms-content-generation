@@ -113,3 +113,50 @@ export interface ExtractItem {
 }
 
 export type ExtractResponse = ExtractItem[];
+
+// Curriculum Types
+export interface CurriculumQuiz {
+  // Add quiz properties as needed
+}
+
+export interface CurriculumModule {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  quizzes: CurriculumQuiz[];
+}
+
+export interface CurriculumTopic {
+  title: string;
+  modules: CurriculumModule[];
+}
+
+export interface CurriculumData {
+  title: string;
+  topics: CurriculumTopic[];
+  modules: CurriculumModule[];
+}
+
+export interface PipelineCompletionData {
+  curriculum: CurriculumData;
+  course_id: string;
+}
+
+// Stream Event Types
+export interface StreamEvent {
+  event: string;
+  data: string | PipelineCompletionData;
+}
+
+// Lesson Generation Types
+export interface LessonContent {
+  module_id: number;
+  title: string;
+  content: string;
+  quizzes: CurriculumQuiz[];
+}
+
+export interface LessonGenerationData {
+  lessons: LessonContent[];
+}

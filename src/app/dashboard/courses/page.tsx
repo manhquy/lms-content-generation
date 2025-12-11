@@ -17,12 +17,12 @@ import { useCourses } from '@/hooks/use-lms';
 import { useGetMe } from '@/features/auth/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWorkspaceStore } from '@/stores/workspace-store';
+import { getGreeting } from '@/lib/utils';
 
 export default function CoursesPage() {
   const router = useRouter();
   const { data: user } = useGetMe();
   const { selectedWorkspaceId } = useWorkspaceStore();
-
   const {
     data: courses,
     isLoading,
@@ -41,7 +41,7 @@ export default function CoursesPage() {
           <div className='flex items-center justify-between border-b px-8 py-2'>
             <div>
               <h1 className='text-foreground text-lg font-bold'>
-                Good Morning, Amy!
+                {getGreeting(user?.full_name)}
               </h1>
               <p className='text-foreground mt-1 text-sm'>
                 Quickly access your recent training, courses and workspaces

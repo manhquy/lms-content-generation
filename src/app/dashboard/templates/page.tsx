@@ -1,3 +1,4 @@
+'use client';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +22,8 @@ import {
 } from '@tabler/icons-react';
 import LikeIcon from '@/components/ui/icon/like';
 import { CircleChevronRight, LayoutGrid } from 'lucide-react';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { getGreeting } from '@/lib/utils';
 
 const featuredTemplates = [
   {
@@ -65,13 +68,15 @@ const templates = [
 ];
 
 export default function TemplatesPage() {
+  const { data: user } = useGetMe();
+
   return (
     <PageContainer scrollable>
       <div className='w-full space-y-6 pb-8'>
         <div className='flex items-center justify-between border-b px-8 py-2'>
           <div>
             <h1 className='text-foreground text-lg font-bold'>
-              Good Morning, Amy!
+              {getGreeting(user?.full_name)}
             </h1>
             <p className='text-foreground mt-1 text-sm'>
               Quickly access your recent training, courses and workspaces

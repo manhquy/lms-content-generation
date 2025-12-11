@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetMe } from '@/features/auth/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,16 +9,23 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: user, isLoading, isError } = useGetMe();
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    // If not loading and there's an error or no user, redirect to login
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!isLoading && (isError || !user)) {
       const token = localStorage.getItem('access_token');
       if (!token) {
         router.push('/auth/sign-in');
       }
     }
-  }, [isLoading, isError, user, router]);
-
+  }, [mounted, isLoading, isError, user, router]);
+  if (!mounted) return null;
   // Show loading state while checking auth
   if (isLoading) {
     return (

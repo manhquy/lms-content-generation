@@ -4,11 +4,22 @@ import { Button } from '@/components/ui/button';
 import { FormData } from './lms-generation-wizard';
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Upload, X, FileText, Pause } from 'lucide-react';
+import {
+  Upload,
+  X,
+  FileText,
+  Pause,
+  Loader2,
+  FileSearch,
+  Brain,
+  BookOpen,
+  CheckCircle
+} from 'lucide-react';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
-import { useExtractFile } from '@/hooks/use-lms';
+import { useExtractCurriculum } from '@/hooks/use-stream';
 import { useWorkspaceStore } from '@/stores/workspace-store';
+import { toast } from 'sonner';
 
 interface UploadFilesStepProps {
   formData: FormData;
@@ -31,11 +42,11 @@ export function UploadFilesStep({
 }: UploadFilesStepProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
-  const [isExtractingFile, setIsExtractingFile] = useState<File | null>(null);
+  const [streamStatus, setStreamStatus] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addExtractedData } = useWorkspaceStore();
-
-  const { mutate: extractFile, isPending: isExtracting } = useExtractFile();
+  const { setCurriculumData, setCourseId, setUploadedFile } =
+    useWorkspaceStore();
+  const { extractCurriculum, isLoading: isExtracting } = useExtractCurriculum();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -78,78 +89,59 @@ export function UploadFilesStep({
   };
 
   const simulateUpload = (file: File) => {
-    const startTime = Date.now();
-    let progress = 0;
-
-    // If it's a zip file, call extract API immediately
+    // If it's a zip file, call extract curriculum API with streaming
     if (file.name.toLowerCase().endsWith('.zip')) {
-      setIsExtractingFile(file);
+      // Store the uploaded file
+      setUploadedFile(file);
 
-      // Start progress animation
-      const progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        // Slow progress that will complete when API responds
-        progress = Math.min(80, Math.floor((elapsed / 100) * 2)); // Reaches 80% slowly
+      // Call streaming extract curriculum API
+      extractCurriculum({
+        file,
+        onProgress: (status) => {
+          // Update progress based on stream events
+          const progress = status.progress || 0;
+          setStreamStatus(status.message);
 
-        setUploadingFiles((prev) =>
-          prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
-        );
-      }, 100);
-
-      // Call extract API
-      extractFile(file, {
-        onSuccess: (data) => {
-          clearInterval(progressInterval);
+          setUploadingFiles((prev) =>
+            prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
+          );
+        },
+        onComplete: (curriculumData, streamCourseId) => {
+          // Store curriculum data and course ID in global store
+          console.log('Storing curriculum data:', curriculumData);
+          console.log('Stream course ID:', streamCourseId);
+          setCurriculumData(curriculumData);
+          // Only set course_id from stream if we don't already have one from create course API
+          if (streamCourseId) {
+            console.log('Setting course ID from stream:', streamCourseId);
+            setCourseId(streamCourseId);
+          } else {
+            console.log('No course ID from stream, keeping existing one');
+          }
 
           // Complete progress animation
           setUploadingFiles((prev) =>
             prev.map((uf) => (uf.file === file ? { ...uf, progress: 100 } : uf))
           );
 
-          // Store extracted data in Zustand
-          addExtractedData(data);
-
           // Move to uploaded files
           setTimeout(() => {
             const updatedFiles = [...formData.uploadedFiles, file];
             onUpdate({ uploadedFiles: updatedFiles });
             setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
-            setIsExtractingFile(null);
+            toast.success('Curriculum extracted successfully!');
           }, 500);
         },
-        onError: () => {
-          clearInterval(progressInterval);
-          // On error, still complete the upload but show error
-          setUploadingFiles((prev) =>
-            prev.map((uf) => (uf.file === file ? { ...uf, progress: 100 } : uf))
-          );
-
-          setTimeout(() => {
-            const updatedFiles = [...formData.uploadedFiles, file];
-            onUpdate({ uploadedFiles: updatedFiles });
-            setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
-            setIsExtractingFile(null);
-          }, 500);
+        onError: (error) => {
+          // On error, show error and remove from uploading
+          toast.error(`Failed to extract curriculum: ${error.message}`);
+          setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
         }
       });
     } else {
-      // For non-zip files, just simulate normal upload
-      const interval = setInterval(() => {
-        progress += 5;
-
-        setUploadingFiles((prev) =>
-          prev.map((uf) => (uf.file === file ? { ...uf, progress } : uf))
-        );
-
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            const updatedFiles = [...formData.uploadedFiles, file];
-            onUpdate({ uploadedFiles: updatedFiles });
-            setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
-          }, 500);
-        }
-      }, 300);
+      // For non-zip files, show error
+      toast.error('Please upload a ZIP file');
+      setUploadingFiles((prev) => prev.filter((uf) => uf.file !== file));
     }
   };
 
@@ -202,6 +194,53 @@ export function UploadFilesStep({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const getStatusIcon = (status: string) => {
+    const lowerStatus = status.toLowerCase();
+
+    // Parser status - File scanning
+    if (
+      lowerStatus.includes('read') ||
+      lowerStatus.includes('pages') ||
+      lowerStatus.includes('parse')
+    ) {
+      return <FileSearch className='h-3.5 w-3.5 animate-pulse text-blue-500' />;
+    }
+
+    // Batch processing
+    if (
+      lowerStatus.includes('batch') ||
+      lowerStatus.includes('completed batch')
+    ) {
+      return <Loader2 className='h-3.5 w-3.5 animate-spin text-purple-500' />;
+    }
+
+    // AI/Agents working
+    if (
+      lowerStatus.includes('agents') ||
+      lowerStatus.includes('working') ||
+      lowerStatus.includes('structure')
+    ) {
+      return <Brain className='h-3.5 w-3.5 animate-pulse text-indigo-500' />;
+    }
+
+    // Curriculum generation
+    if (
+      lowerStatus.includes('curriculum') ||
+      lowerStatus.includes('grouped') ||
+      lowerStatus.includes('modules')
+    ) {
+      return <BookOpen className='h-3.5 w-3.5 animate-pulse text-green-500' />;
+    }
+
+    // Completion
+    if (lowerStatus.includes('complete') || lowerStatus.includes('done')) {
+      return <CheckCircle className='h-3.5 w-3.5 text-green-600' />;
+    }
+
+    // Default loading
+    return <Loader2 className='text-primary h-3.5 w-3.5 animate-spin' />;
+  };
+
   return (
     <div className='max-w-2xl'>
       <div className='space-y-6'>
@@ -215,14 +254,16 @@ export function UploadFilesStep({
 
         {/* Upload Area */}
         <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          onDragOver={isExtracting ? undefined : handleDragOver}
+          onDragLeave={isExtracting ? undefined : handleDragLeave}
+          onDrop={isExtracting ? undefined : handleDrop}
           className={cn(
             'rounded-lg border-2 p-4 text-center transition-colors',
-            isDragOver
-              ? 'border-primary bg-primary/20 border'
-              : 'border-primary border-dashed'
+            isExtracting
+              ? 'border-muted bg-muted/50 pointer-events-none opacity-60'
+              : isDragOver
+                ? 'border-primary bg-primary/20 border'
+                : 'border-primary border-dashed'
           )}
         >
           <div className='flex flex-col items-center space-y-4'>
@@ -239,6 +280,7 @@ export function UploadFilesStep({
               <Button
                 variant='outline'
                 onClick={handleUploadClick}
+                disabled={isExtracting}
                 className='mt-2'
               >
                 Upload
@@ -269,17 +311,28 @@ export function UploadFilesStep({
                   className='bg-card space-y-3 rounded-lg border p-4'
                 >
                   <div className='flex items-start justify-between'>
-                    <div>
-                      <p className='text-sm font-medium'>
-                        {isExtractingFile === uploadingFile.file
-                          ? 'Extracting and analyzing...'
-                          : 'Uploading...'}
-                      </p>
-                      <p className='text-muted-foreground text-xs'>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2'>
+                        {isExtracting && (
+                          <Loader2 className='text-primary h-4 w-4 animate-spin' />
+                        )}
+                        <p className='text-sm font-medium'>
+                          {isExtracting
+                            ? 'Extracting and analyzing curriculum...'
+                            : 'Processing...'}
+                        </p>
+                      </div>
+                      <p className='text-muted-foreground mt-1 text-xs'>
                         {uploadingFile.progress}%
-                        {isExtractingFile !== uploadingFile.file &&
-                          ` • ${remainingTime} seconds remaining`}
                       </p>
+                      {streamStatus && (
+                        <div className='mt-1.5 flex items-start gap-1.5'>
+                          {getStatusIcon(streamStatus)}
+                          <p className='text-muted-foreground line-clamp-2 flex-1 text-xs'>
+                            {streamStatus}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div className='flex items-center space-x-2'>
                       <Button
@@ -343,14 +396,22 @@ export function UploadFilesStep({
         <div className='flex flex-col justify-between gap-4 pt-8'>
           <Button
             onClick={onNext}
-            // disabled={!isValid}
+            disabled={isExtracting || formData.uploadedFiles.length === 0}
             className='bg-primary hover:bg-primary/90 px-8'
           >
-            Continue
+            {isExtracting ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Extracting...
+              </>
+            ) : (
+              'Continue'
+            )}
           </Button>
           <Button
             variant='ghost'
             onClick={onBack}
+            disabled={isExtracting}
             className='bg-primary/30 hover:bg-primary/40 text-primary px-8'
           >
             Back

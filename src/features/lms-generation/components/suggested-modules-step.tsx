@@ -47,34 +47,90 @@ export function SuggestedModulesStep({
   onNext,
   onBack
 }: SuggestedModulesStepProps) {
-  const { extractedData } = useWorkspaceStore();
+  const { curriculumData, setCurriculumData } = useWorkspaceStore();
 
-  // Initialize module groups from extracted data - only show selected topics
+  // Sync module groups back to curriculum data
+  const syncModuleGroupsToCurriculum = (groups: ModuleGroup[]) => {
+    if (!curriculumData) return;
+
+    // Update curriculum data with modified module groups
+    const updatedTopics = groups.map((group, index) => {
+      // Find existing topic or create new one
+      const existingTopic = curriculumData.topics.find(
+        (t) => t.title === group.title
+      );
+      const baseId = existingTopic
+        ? existingTopic.modules[0]?.id || (index + 1) * 100
+        : (index + 1) * 100;
+
+      return {
+        title: group.title,
+        modules: group.modules.map((module, moduleIndex) => {
+          // Try to find existing module to preserve its ID
+          const existingModule = existingTopic?.modules.find(
+            (m) => m.title === module.name
+          );
+          return {
+            id: existingModule?.id || baseId + moduleIndex,
+            title: module.name,
+            description: existingModule?.description || '',
+            content: existingModule?.content || '',
+            quizzes: existingModule?.quizzes || []
+          };
+        })
+      };
+    });
+
+    // Update the full modules array
+    const allModules = updatedTopics.flatMap((topic) => topic.modules);
+
+    setCurriculumData({
+      ...curriculumData,
+      topics: updatedTopics,
+      modules: allModules
+    });
+  };
+
+  // Initialize module groups from curriculum data - only show selected topics
   const getInitialModuleGroups = (): ModuleGroup[] => {
-    if (extractedData.length > 0 && formData.selectedTopics.length > 0) {
+    if (
+      curriculumData &&
+      curriculumData.topics &&
+      formData.selectedTopics.length > 0
+    ) {
+      console.log('Building module groups from:', curriculumData);
+      console.log('Selected topics:', formData.selectedTopics);
       // Filter to only include topics that were selected in previous step
-      return extractedData
-        .filter((item) => formData.selectedTopics.includes(item.topic))
-        .map((item) => ({
-          title: item.topic,
-          modules: item.modules.map((moduleName) => ({
-            name: moduleName
+      const groups = curriculumData.topics
+        .filter((topic) => formData.selectedTopics.includes(topic.title))
+        .map((topic) => ({
+          title: topic.title,
+          modules: topic.modules.map((module) => ({
+            name: module.title
           }))
         }));
+      console.log('Generated module groups:', groups);
+      return groups;
     }
-    return []; // Start empty if no extracted data or no selected topics
+    return []; // Start empty if no curriculum data or no selected topics
   };
 
   const [moduleGroups, setModuleGroups] = useState<ModuleGroup[]>(
     getInitialModuleGroups()
   );
 
-  // Update module groups when extracted data or selected topics change
+  // Update module groups when curriculum data or selected topics change
   useEffect(() => {
-    if (extractedData.length > 0 || formData.selectedTopics.length > 0) {
-      setModuleGroups(getInitialModuleGroups());
+    console.log('useEffect triggered - curriculumData:', curriculumData);
+    console.log(
+      'useEffect triggered - selectedTopics:',
+      formData.selectedTopics
+    );
+    if (curriculumData && formData.selectedTopics.length > 0) {
+      const newGroups = getInitialModuleGroups();
+      setModuleGroups(newGroups);
     }
-  }, [extractedData, formData.selectedTopics]);
+  }, [curriculumData, formData.selectedTopics.length]);
 
   const [draggedItem, setDraggedItem] = useState<{
     groupIndex: number;
@@ -121,6 +177,7 @@ export function SuggestedModulesStep({
     }
 
     setModuleGroups(newGroups);
+    syncModuleGroupsToCurriculum(newGroups);
     setDraggedItem(null);
   };
 
@@ -142,6 +199,7 @@ export function SuggestedModulesStep({
       name: editDialog.value
     };
     setModuleGroups(newGroups);
+    syncModuleGroupsToCurriculum(newGroups);
     setEditDialog({ open: false, groupIndex: -1, moduleIndex: -1, value: '' });
   };
 
@@ -155,6 +213,7 @@ export function SuggestedModulesStep({
     }
 
     setModuleGroups(newGroups);
+    syncModuleGroupsToCurriculum(newGroups);
   };
 
   const handleAddCustomModules = () => {
@@ -185,6 +244,7 @@ export function SuggestedModulesStep({
     }
 
     setModuleGroups(newGroups);
+    syncModuleGroupsToCurriculum(newGroups);
     setAddDialog({ open: false, groupTitle: '', moduleName: '' });
   };
 
@@ -265,7 +325,11 @@ export function SuggestedModulesStep({
 
         <div className='flex flex-col gap-4 pt-2 pb-8'>
           <Button
-            onClick={onNext}
+            onClick={() => {
+              // Sync final state before continuing
+              syncModuleGroupsToCurriculum(moduleGroups);
+              onNext();
+            }}
             className='bg-primary hover:bg-primary/90 px-8'
           >
             Continue

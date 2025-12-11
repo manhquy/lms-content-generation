@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import moment from 'moment';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,3 +25,20 @@ export function formatBytes(
       : (sizes[i] ?? 'Bytes')
   }`;
 }
+
+export const getGreeting = (name?: string) => {
+  const hour = moment().get('hour');
+  let greeting;
+
+  if (hour < 12) {
+    greeting = 'Good morning';
+  } else if (hour < 18) {
+    greeting = 'Good afternoon';
+  } else {
+    greeting = 'Good evening';
+  }
+  if (!!name) {
+    greeting = `${greeting}, ${name}`;
+  }
+  return `${greeting}!`;
+};

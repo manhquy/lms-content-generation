@@ -12,6 +12,8 @@ import { CompletionStep } from './completion-step';
 import { StepNavigation } from './step-navigation';
 import LikeIcon from '@/components/ui/icon/like';
 import Image from 'next/image';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { getGreeting } from '@/lib/utils';
 
 export type WizardStep =
   | 'topic'
@@ -40,6 +42,7 @@ export function LmsGenerationWizard() {
     selectedModules: [],
     selectedOutputs: []
   });
+  const { data: user } = useGetMe();
 
   const steps: { id: WizardStep; label: string; number: number }[] = [
     { id: 'topic', label: 'Topic', number: 1 },
@@ -143,7 +146,7 @@ export function LmsGenerationWizard() {
           <div className='flex items-center justify-between border-b px-8 py-2'>
             <div>
               <h1 className='text-foreground text-lg font-bold'>
-                Good Morning, Amy!
+                {getGreeting(user?.full_name)}
               </h1>
               <p className='text-foreground mt-1 text-sm'>
                 Quickly access your recent training, courses and workspaces

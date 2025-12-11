@@ -11,6 +11,11 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { FormData } from './lms-generation-wizard';
+import { useWorkspaces, useCreateCourse } from '@/hooks/use-lms';
+import { useGetMe } from '@/features/auth/hooks/useAuth';
+import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 interface TrainingTopicStepProps {
   formData: FormData;
@@ -25,15 +30,46 @@ export function TrainingTopicStep({
   onNext,
   onBack
 }: TrainingTopicStepProps) {
+  const { data: user } = useGetMe();
+  const { data: workspaces, isLoading: isLoadingWorkspaces } = useWorkspaces(
+    user?.id || ''
+  );
+  const { mutate: createCourse, isPending: isCreatingCourse } =
+    useCreateCourse();
+  const { selectedWorkspaceId, setSelectedWorkspaceId, setCourseId } =
+    useWorkspaceStore();
+
   const handleTrainingTopicChange = (value: string) => {
     onUpdate({ trainingTopic: value });
   };
 
   const handleWorkspaceChange = (value: string) => {
+    setSelectedWorkspaceId(value);
     onUpdate({ workspace: value });
   };
 
-  const isValid = formData.trainingTopic.trim().length > 0;
+  const handleContinue = () => {
+    if (!selectedWorkspaceId || !user?.id) return;
+
+    // Create course before moving to next step
+    createCourse(
+      {
+        name: formData.trainingTopic,
+        description: `Training course for ${formData.trainingTopic}`,
+        workspace_id: selectedWorkspaceId,
+        user_id: user.id
+      },
+      {
+        onSuccess: (course) => {
+          setCourseId(course.id);
+          onNext();
+        }
+      }
+    );
+  };
+
+  const isValid =
+    formData.trainingTopic.trim().length > 0 && !!selectedWorkspaceId;
 
   return (
     <div className='max-w-2xl'>
@@ -65,16 +101,29 @@ export function TrainingTopicStep({
               Workspace
             </Label>
             <Select
-              value={formData.workspace}
+              value={selectedWorkspaceId || undefined}
               onValueChange={handleWorkspaceChange}
+              disabled={isLoadingWorkspaces}
             >
               <SelectTrigger className='w-full'>
                 <SelectValue placeholder='Select workspace' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='Prior Auth'>Prior Auth</SelectItem>
-                <SelectItem value='Claims'>Claims</SelectItem>
-                <SelectItem value='Brokers'>Brokers</SelectItem>
+                {isLoadingWorkspaces ? (
+                  <SelectItem value='loading' disabled>
+                    Loading workspaces...
+                  </SelectItem>
+                ) : workspaces && workspaces.length > 0 ? (
+                  workspaces.map((workspace) => (
+                    <SelectItem key={workspace.id} value={workspace.id}>
+                      {workspace.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value='none' disabled>
+                    No workspaces available
+                  </SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -82,15 +131,23 @@ export function TrainingTopicStep({
 
         <div className='flex flex-col justify-between gap-4 pt-8'>
           <Button
-            onClick={onNext}
-            // disabled={!isValid}
-            className='bg-primary hover:bg-primary/90 px-8'
+            onClick={handleContinue}
+            disabled={!isValid || isCreatingCourse}
+            className='bg-primary hover:bg-primary/90 px-8 disabled:cursor-not-allowed disabled:opacity-50'
           >
-            Continue
+            {isCreatingCourse ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Creating Course...
+              </>
+            ) : (
+              'Continue'
+            )}
           </Button>
           <Button
             variant='ghost'
             onClick={onBack}
+            disabled={isCreatingCourse}
             className='bg-primary/30 hover:bg-primary/40 text-primary px-8'
           >
             Back

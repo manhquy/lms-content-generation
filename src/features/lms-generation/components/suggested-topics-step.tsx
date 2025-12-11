@@ -32,10 +32,20 @@ export function SuggestedTopicsStep({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTopic, setNewTopic] = useState('');
   const [customTopics, setCustomTopics] = useState<string[]>([]); // Only user-added topics
-  const { extractedData } = useWorkspaceStore();
+  const [customTopicIds, setCustomTopicIds] = useState<Set<string>>(new Set()); // Track which topics are custom
+  const { curriculumData, setCurriculumData } = useWorkspaceStore();
 
-  // Extract only topics from extracted data
-  const extractedTopics = extractedData.map((item) => item.topic);
+  // Extract only topics from curriculum data
+  const extractedTopics =
+    curriculumData?.topics.map((topic) => topic.title) || [];
+
+  // Auto-select all extracted topics on mount or when curriculum data changes
+  useEffect(() => {
+    if (extractedTopics.length > 0 && formData.selectedTopics.length === 0) {
+      console.log('Auto-selecting topics:', extractedTopics);
+      onUpdate({ selectedTopics: extractedTopics });
+    }
+  }, [curriculumData, extractedTopics.length]);
 
   const handleTopicToggle = (topic: string, checked: boolean) => {
     let updatedTopics;
@@ -47,30 +57,54 @@ export function SuggestedTopicsStep({
     onUpdate({ selectedTopics: updatedTopics });
   };
 
+  // Combine extracted topics with custom topics, removing duplicates
+  const allTopics = Array.from(new Set([...extractedTopics, ...customTopics]));
+
   const handleAddTopics = () => {
     setIsDialogOpen(true);
   };
 
   const handleAddNewTopic = () => {
-    if (newTopic.trim() && !customTopics.includes(newTopic.trim())) {
-      const updatedCustomTopics = [...customTopics, newTopic.trim()];
+    const trimmedTopic = newTopic.trim();
+    // Check against allTopics to prevent duplicates
+    if (trimmedTopic && !allTopics.includes(trimmedTopic)) {
+      const updatedCustomTopics = [...customTopics, trimmedTopic];
       setCustomTopics(updatedCustomTopics);
+      const newIds = new Set(customTopicIds);
+      newIds.add(trimmedTopic);
+      setCustomTopicIds(newIds);
       setNewTopic('');
     }
   };
 
   const handleRemoveCustomTopic = (topicToRemove: string) => {
-    // Only allow removing custom topics, not extracted ones
-    if (!extractedTopics.includes(topicToRemove)) {
+    // Only allow removing custom topics
+    if (customTopicIds.has(topicToRemove)) {
       const updatedCustomTopics = customTopics.filter(
         (t) => t !== topicToRemove
       );
       setCustomTopics(updatedCustomTopics);
+
+      const newCustomTopicIds = new Set(customTopicIds);
+      newCustomTopicIds.delete(topicToRemove);
+      setCustomTopicIds(newCustomTopicIds);
+
       // Also remove from selected topics if it was selected
       const updatedSelectedTopics = formData.selectedTopics.filter(
         (t) => t !== topicToRemove
       );
       onUpdate({ selectedTopics: updatedSelectedTopics });
+
+      // Remove from curriculumData if it exists there
+      if (curriculumData) {
+        const updatedCurriculumData = {
+          ...curriculumData,
+          topics: curriculumData.topics.filter(
+            (topic) => topic.title !== topicToRemove
+          )
+        };
+        setCurriculumData(updatedCurriculumData);
+      }
     }
   };
 
@@ -84,6 +118,29 @@ export function SuggestedTopicsStep({
       ...newlyAddedTopics
     ];
     onUpdate({ selectedTopics: updatedSelectedTopics });
+
+    // Update curriculumData to include custom topics (only if not already there)
+    if (curriculumData && newlyAddedTopics.length > 0) {
+      const existingTitles = new Set(curriculumData.topics.map((t) => t.title));
+      const topicsToAdd = newlyAddedTopics.filter(
+        (topic) => !existingTitles.has(topic)
+      );
+
+      if (topicsToAdd.length > 0) {
+        const updatedCurriculumData = {
+          ...curriculumData,
+          topics: [
+            ...curriculumData.topics,
+            ...topicsToAdd.map((topic) => ({
+              title: topic,
+              modules: [] // Empty modules array for custom topics
+            }))
+          ]
+        };
+        setCurriculumData(updatedCurriculumData);
+      }
+    }
+
     setIsDialogOpen(false);
   };
 
@@ -93,9 +150,6 @@ export function SuggestedTopicsStep({
       handleAddNewTopic();
     }
   };
-
-  // Combine extracted topics (from PDF) with custom topics (user-added)
-  const allTopics = [...extractedTopics, ...customTopics];
 
   return (
     <div className='max-w-2xl'>
@@ -112,13 +166,12 @@ export function SuggestedTopicsStep({
         </div>
 
         <div className='flex flex-wrap gap-3'>
-          {allTopics.map((topic) => {
+          {allTopics.map((topic, index) => {
             const isSelected = formData.selectedTopics.includes(topic);
-            const isExtracted = extractedTopics.includes(topic);
-            const isCustom = customTopics.includes(topic);
+            const isCustomTopic = customTopicIds.has(topic);
             return (
               <label
-                key={topic}
+                key={`${topic}-${index}`}
                 className='hover:bg-muted/50 border-primary flex cursor-pointer items-center space-x-2 rounded-full border px-4 py-2 transition-colors'
               >
                 <Checkbox
@@ -129,8 +182,8 @@ export function SuggestedTopicsStep({
                   className='h-4 w-4 rounded-full border border-gray-300 transition-colors data-[state=checked]:border-green-500 data-[state=checked]:bg-green-500'
                 />
                 <span className='text-sm font-medium'>{topic}</span>
-                {/* Only show remove button for custom topics, not extracted ones */}
-                {isCustom && !isExtracted && (
+                {/* Only show remove button for custom topics */}
+                {isCustomTopic && (
                   <button
                     type='button'
                     onClick={(e) => {
