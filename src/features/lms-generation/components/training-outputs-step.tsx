@@ -128,7 +128,7 @@ export function TrainingOutputsStep({
 
   const handleReviewContent = () => {
     setShowModal(false);
-    router.push('/dashboard/module');
+    router.push(`/dashboard/module?course_id=${courseId}`);
   };
 
   return (

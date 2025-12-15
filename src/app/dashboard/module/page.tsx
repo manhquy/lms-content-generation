@@ -222,7 +222,7 @@ export default function ModulePage() {
                         <h3 className='mb-4 text-xl font-semibold'>
                           {lessonResources[0].name}
                         </h3>
-                        <div className='text-foreground prose prose-sm max-w-none'>
+                        <div className='text-foreground content-markdown prose prose-sm max-w-none'>
                           <ReactMarkdown>
                             {lessonResources[0].resource_data?.content || ''}
                           </ReactMarkdown>
@@ -248,10 +248,7 @@ export default function ModulePage() {
                 ) : quizResources && quizResources.length > 0 ? (
                   <div className='space-y-6'>
                     {quizResources.map((quiz, idx) => (
-                      <div
-                        key={quiz.id}
-                        className='bg-card rounded-lg border p-6'
-                      >
+                      <div key={quiz.id} className='rounded-lg border p-6'>
                         <h4 className='mb-4 text-lg font-semibold'>
                           Question {idx + 1}
                         </h4>
@@ -272,7 +269,7 @@ export default function ModulePage() {
                                   className={`rounded-md border p-3 ${
                                     isCorrectAnswer
                                       ? 'border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-950'
-                                      : 'bg-muted/50'
+                                      : ''
                                   }`}
                                 >
                                   <div className='flex items-start gap-3'>

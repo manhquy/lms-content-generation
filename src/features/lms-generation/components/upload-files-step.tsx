@@ -335,14 +335,14 @@ export function UploadFilesStep({
                       )}
                     </div>
                     <div className='flex items-center space-x-2'>
-                      <Button
+                      {/* <Button
                         variant='ghost'
                         size='sm'
                         onClick={() => togglePause(uploadingFile.file)}
-                        className='h-8 w-8 rounded-full p-0'
+                        className='p-0 rounded-full w-8 h-8'
                       >
-                        <Pause className='h-4 w-4' />
-                      </Button>
+                        <Pause className='w-4 h-4' />
+                      </Button> */}
                       <Button
                         variant='ghost'
                         size='sm'
