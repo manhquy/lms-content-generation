@@ -150,9 +150,9 @@ export const resourceService = {
     return response.data;
   },
 
-  getAll: async (moduleId: string): Promise<Resource[]> => {
+  getAll: async (moduleId: string, type?: string): Promise<Resource[]> => {
     const response = await apiClient.get<Resource[]>('/api/v1/resources', {
-      params: { module_id: moduleId }
+      params: { module_id: moduleId, type }
     });
     return response.data;
   },

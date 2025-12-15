@@ -30,8 +30,8 @@ export default function CoursesPage() {
     error
   } = useCourses(selectedWorkspaceId || '', user?.id || '');
 
-  const handleViewCourse = (courseId: number) => {
-    router.push('/dashboard/module');
+  const handleViewCourse = (courseId: string) => {
+    router.push(`/dashboard/module?course_id=${courseId}`);
   };
 
   return (
@@ -131,7 +131,7 @@ export default function CoursesPage() {
                       <Button
                         className='w-full'
                         variant='default'
-                        onClick={() => handleViewCourse(Number(course.id))}
+                        onClick={() => handleViewCourse(course.id)}
                       >
                         View Course
                       </Button>

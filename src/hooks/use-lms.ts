@@ -32,7 +32,8 @@ export const lmsKeys = {
   module: (id: string) => ['module', id] as const,
   topics: (courseId: string) => ['topics', courseId] as const,
   topic: (id: string) => ['topic', id] as const,
-  resources: (moduleId: string) => ['resources', moduleId] as const,
+  resources: (moduleId: string, type?: string) =>
+    ['resources', moduleId, type] as const,
   resource: (id: string) => ['resource', id] as const
 };
 
@@ -329,10 +330,10 @@ export const useDeleteTopic = () => {
 
 // ============ Resource Hooks ============
 
-export const useResources = (moduleId: string) => {
+export const useResources = (moduleId: string, type?: string) => {
   return useQuery({
-    queryKey: lmsKeys.resources(moduleId),
-    queryFn: () => resourceService.getAll(moduleId),
+    queryKey: lmsKeys.resources(moduleId, type),
+    queryFn: () => resourceService.getAll(moduleId, type),
     enabled: !!moduleId
   });
 };

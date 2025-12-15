@@ -50,7 +50,7 @@ export function TrainingOutputsStep({
 }: TrainingOutputsStepProps) {
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([
     'lessons',
-    'videos'
+    'quiz'
   ]);
   const [showModal, setShowModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);

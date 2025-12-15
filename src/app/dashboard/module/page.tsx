@@ -18,7 +18,7 @@ import {
   IconFileStack
 } from '@tabler/icons-react';
 import LikeIcon from '@/components/ui/icon/like';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -48,17 +48,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useGetMe } from '@/features/auth/hooks/useAuth';
 import { getGreeting } from '@/lib/utils';
-
-const modules = [
-  { id: 1, title: 'Introduction to Prior Auth', label: 'Module 1' },
-  { id: 2, title: 'PA Intake & Case Creation', label: 'Module 2' },
-  { id: 3, title: 'Clinical Requirements', label: 'Module 3' },
-  { id: 4, title: 'Payer-Specific Submission', label: 'Module 4' },
-  { id: 5, title: 'Provider Communication', label: 'Module 5' },
-  { id: 6, title: 'Handling Denials', label: 'Module 6' },
-  { id: 7, title: 'Regulatory & Compliance', label: 'Module 7' },
-  { id: 8, title: 'Understanding HIPAA', label: 'Module 8' }
-];
+import { useModules, useResources } from '@/hooks/use-lms';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSearchParams } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 
 const videoScripts = [
   {
@@ -91,19 +84,41 @@ const audioTranscript = [
 ];
 
 export default function ModulePage() {
-  const [activeModule, setActiveModule] = useState(1);
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get('course_id') || '';
+
+  const [activeModuleId, setActiveModuleId] = useState<string>('');
   const [activeTab, setActiveTab] = useState('lessons');
   const [selectedPerson, setSelectedPerson] = useState('Amy Smith');
   const [selectedTone, setSelectedTone] = useState('Positive');
   const [selectedLanguage, setSelectedLanguage] = useState('English');
-  const [lessonContent, setLessonContent] =
-    useState(`Prior Authorization (PA) is a review process used by health plans to determine whether a prescribed service, procedure, medication, or equipment is medically necessary before it is delivered to the patient. It acts as a cost-control and quality-assurance mechanism.
-
-Prior Authorization exists to ensure members receive appropriate, evidence-based care while protecting the healthcare system from unnecessary or duplicative services. Payers use PA to apply clinical guidelines consistently, prevent over-utilization, and maintain compliance with federal and state regulations such as CMS standards. Ultimately, PA balances patient appropriateness, and cost management.`);
-
   const [showRewriteMenu, setShowRewriteMenu] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const { data: user } = useGetMe();
+
+  // Fetch modules for the course
+  const { data: modules, isLoading: modulesLoading } = useModules(courseId);
+
+  // Fetch lesson resources for active module
+  const { data: lessonResources, isLoading: lessonLoading } = useResources(
+    activeModuleId,
+    'lesson'
+  );
+
+  // Fetch quiz resources for active module (only when quizzes tab is active)
+  const { data: quizResources, isLoading: quizzesLoading } = useResources(
+    activeModuleId && activeTab === 'quizzes' ? activeModuleId : '',
+    'quizzes'
+  );
+
+  // Set first module as active when modules load
+  useEffect(() => {
+    if (modules && modules.length > 0 && !activeModuleId) {
+      setActiveModuleId(modules[0].id);
+    }
+  }, [modules, activeModuleId]);
+
+  const activeModule = modules?.find((m) => m.id === activeModuleId);
 
   const handleTextSelection = () => {
     const selection = window.getSelection();
@@ -142,12 +157,18 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
           {/* Left Content - Video and Tabs */}
           <div className='border-r p-8 lg:col-span-2'>
             <div className='mb-4'>
-              <p className='text-primary text-xs font-bold uppercase'>
-                MODULE 1
-              </p>
-              <h2 className='text-2xl font-semibold'>
-                Prior Authorization Fundamentals
-              </h2>
+              {activeModule && (
+                <>
+                  <p className='text-primary text-xs font-bold uppercase'>
+                    MODULE{' '}
+                    {(modules?.findIndex((m) => m.id === activeModuleId) ??
+                      -1) + 1}
+                  </p>
+                  <h2 className='text-2xl font-semibold'>
+                    {activeModule.name}
+                  </h2>
+                </>
+              )}
             </div>
 
             {/* Video Player */}
@@ -174,101 +195,123 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
                 </TabsTrigger>
 
                 <TabsTrigger
-                  value='video'
+                  value='quizzes'
                   className='data-[state=active]:border-b-primary gap-2 rounded-none border-b-2 border-transparent p-4 data-[state=active]:bg-transparent data-[state=active]:shadow-none'
                   style={{ flex: '0 0 auto' }}
                 >
-                  <VideoIcon className='h-4 w-4 shrink-0' />
-                  Video
+                  <IconFileText className='h-4 w-4 shrink-0' />
+                  Quizzes
                 </TabsTrigger>
 
-                <TabsTrigger
-                  value='audio'
-                  className='data-[state=active]:border-b-primary gap-2 rounded-none border-b-2 border-transparent p-4 data-[state=active]:bg-transparent data-[state=active]:shadow-none'
-                  style={{ flex: '0 0 auto' }}
-                >
-                  <VolumnIcon className='h-4 w-4 shrink-0' />
-                  Audio
-                </TabsTrigger>
+                {/* Video and Audio tabs temporarily hidden */}
               </TabsList>
 
               {/* Lessons Tab */}
               <TabsContent value='lessons' className='mt-4'>
-                <div className='space-y-6'>
-                  <div>
-                    <h3 className='mb-4 text-xl font-semibold'>
-                      Prior Authorization (PA)
-                    </h3>
-                    <div
-                      className='text-foreground relative space-y-4 text-sm leading-relaxed'
-                      onMouseUp={handleTextSelection}
-                    >
-                      {lessonContent.split('\n\n').map((paragraph, index) => (
-                        <p className='font-medium' key={index}>
-                          {paragraph}
-                        </p>
-                      ))}
-
-                      {/* Rewrite Menu */}
-                      {showRewriteMenu && selectedText && (
-                        <div className='absolute z-10 mt-2 rounded-lg border bg-white shadow-lg'>
-                          <DropdownMenu open={showRewriteMenu}>
-                            <DropdownMenuContent className='w-56'>
-                              <DropdownMenuItem className='gap-2'>
-                                <IconFileStack className='h-4 w-4' />
-                                Extend Section
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className='gap-2'>
-                                <IconSparkles className='h-4 w-4' />
-                                Rewrite with AI
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className='gap-2'>
-                                <IconFileText className='h-4 w-4' />
-                                Generate Image
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                {lessonLoading ? (
+                  <div className='space-y-4'>
+                    <Skeleton className='h-8 w-3/4' />
+                    <Skeleton className='h-32 w-full' />
+                    <Skeleton className='h-32 w-full' />
+                  </div>
+                ) : (
+                  <div className='space-y-6'>
+                    {/* Lesson Content */}
+                    {lessonResources && lessonResources.length > 0 ? (
+                      <div>
+                        <h3 className='mb-4 text-xl font-semibold'>
+                          {lessonResources[0].name}
+                        </h3>
+                        <div className='text-foreground prose prose-sm max-w-none'>
+                          <ReactMarkdown>
+                            {lessonResources[0].resource_data?.content || ''}
+                          </ReactMarkdown>
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className='mb-4 text-xl font-semibold'>
-                      When is Prior Authorization Required?
-                    </h3>
-                  </div>
-
-                  {/* Text Input Area */}
-                  <div className='relative rounded-2xl border bg-white'>
-                    <Textarea
-                      placeholder='Describe what you want to add, remove or replace...'
-                      className='w-full resize-none border-none px-3 shadow-none focus-visible:ring-0'
-                    />
-                    <div className='flex items-center justify-between gap-2 p-4'>
-                      <div className='flex flex-row gap-2'>
-                        <button>
-                          <Plus className='h-4 w-4 text-black' />
-                        </button>
-                        <button>
-                          <Settings2 className='h-4 w-4 text-black' />
-                        </button>
                       </div>
-                      <div className='flex flex-row gap-2'>
-                        <button className='rounded-full border p-1'>
-                          <Mic className='h-4 w-4 text-black' />
-                        </button>
-                        <button className='rounded-full border p-1'>
-                          <MoveUp className='h-4 w-4 text-black' />
-                        </button>
+                    ) : (
+                      <div className='text-muted-foreground py-12 text-center'>
+                        No lesson content available
                       </div>
-                    </div>
+                    )}
                   </div>
-                </div>
+                )}
               </TabsContent>
 
-              {/* Video Tab */}
-              <TabsContent value='video' className='mt-6'>
+              {/* Quizzes Tab */}
+              <TabsContent value='quizzes' className='mt-4'>
+                {quizzesLoading ? (
+                  <div className='space-y-4'>
+                    <Skeleton className='h-32 w-full' />
+                    <Skeleton className='h-32 w-full' />
+                    <Skeleton className='h-32 w-full' />
+                  </div>
+                ) : quizResources && quizResources.length > 0 ? (
+                  <div className='space-y-6'>
+                    {quizResources.map((quiz, idx) => (
+                      <div
+                        key={quiz.id}
+                        className='bg-card rounded-lg border p-6'
+                      >
+                        <h4 className='mb-4 text-lg font-semibold'>
+                          Question {idx + 1}
+                        </h4>
+                        <p className='mb-4 text-base font-medium'>
+                          {quiz.resource_data?.question}
+                        </p>
+                        <div className='space-y-3'>
+                          <p className='text-muted-foreground text-sm font-semibold'>
+                            Options:
+                          </p>
+                          {quiz.resource_data?.options?.map(
+                            (option: string, optIdx: number) => {
+                              const isCorrectAnswer =
+                                option === quiz.resource_data?.answer;
+                              return (
+                                <div
+                                  key={optIdx}
+                                  className={`rounded-md border p-3 ${
+                                    isCorrectAnswer
+                                      ? 'border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-950'
+                                      : 'bg-muted/50'
+                                  }`}
+                                >
+                                  <div className='flex items-start gap-3'>
+                                    <span className='text-sm font-medium'>
+                                      {String.fromCharCode(65 + optIdx)}.
+                                    </span>
+                                    <span className='flex-1 text-sm'>
+                                      {option}
+                                    </span>
+                                    {isCorrectAnswer && (
+                                      <Badge
+                                        variant='default'
+                                        className='bg-green-600 text-white'
+                                      >
+                                        Correct Answer
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className='text-muted-foreground py-12 text-center'>
+                    No quiz questions available
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Video Tab - Hidden */}
+              <TabsContent
+                value='video'
+                className='mt-6'
+                style={{ display: 'none' }}
+              >
                 <div className='space-y-6'>
                   {/* Video Thumbnails */}
                   <div className='flex gap-4 overflow-x-auto pb-4'>
@@ -299,7 +342,7 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
                         <p className='text-primary mb-1 text-xs font-semibold'>
                           {script.timestamp}
                         </p>
-                        <div className='flex-shrink-0'>
+                        <div className='shrink-0'>
                           <div className='h-16 w-24 overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-gray-300'>
                             <img
                               src={script.thumbnail}
@@ -349,8 +392,12 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
                 </div>
               </TabsContent>
 
-              {/* Audio Tab */}
-              <TabsContent value='audio' className='mt-6'>
+              {/* Audio Tab - Hidden */}
+              <TabsContent
+                value='audio'
+                className='mt-6'
+                style={{ display: 'none' }}
+              >
                 <div className='space-y-6'>
                   {/* Audio Controls */}
                   <div className='flex items-center gap-4'>
@@ -412,7 +459,7 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
                   <div className='space-y-4'>
                     {audioTranscript.map((item, index) => (
                       <div key={index} className='flex gap-4'>
-                        <p className='text-primary flex-shrink-0 text-sm font-semibold'>
+                        <p className='text-primary shrink-0 text-sm font-semibold'>
                           {item.timestamp}
                         </p>
                         <p className='text-foreground flex-1 text-sm leading-relaxed font-medium'>
@@ -456,25 +503,37 @@ Prior Authorization exists to ensure members receive appropriate, evidence-based
           <div className='lg:col-span-1'>
             <div className='py-8 pr-8'>
               <h3 className='mb-4 text-sm font-semibold'>Modules</h3>
-              <div className='space-y-2'>
-                {modules.map((module) => (
-                  <div
-                    key={module.id}
-                    onClick={() => setActiveModule(module.id)}
-                    className={`w-full rounded-lg border p-2 text-left transition-colors`}
-                  >
-                    <div className='flex flex-row items-center gap-3'>
-                      <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950'></div>
-                      <div>
-                        <div className='font-medium'>{module.title}</div>
-                        <div className='text-muted-foreground text-sm'>
-                          {module.label}
+              {modulesLoading ? (
+                <div className='space-y-2'>
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className='h-16 w-full' />
+                  ))}
+                </div>
+              ) : (
+                <div className='space-y-2'>
+                  {modules?.map((module, index) => (
+                    <div
+                      key={module.id}
+                      onClick={() => setActiveModuleId(module.id)}
+                      className={`hover:bg-muted w-full cursor-pointer rounded-lg border p-2 text-left transition-colors ${
+                        activeModuleId === module.id
+                          ? 'bg-muted border-primary'
+                          : ''
+                      }`}
+                    >
+                      <div className='flex flex-row items-center gap-3'>
+                        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950'></div>
+                        <div>
+                          <div className='font-medium'>{module.name}</div>
+                          <div className='text-muted-foreground text-sm'>
+                            Module {index + 1}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
