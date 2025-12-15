@@ -323,7 +323,7 @@ export function UploadFilesStep({
                         </p>
                       </div>
                       <p className='text-muted-foreground mt-1 text-xs'>
-                        {uploadingFile.progress}%
+                        {Math.round(uploadingFile.progress)}%
                       </p>
                       {streamStatus && (
                         <div className='mt-1.5 flex items-start gap-1.5'>
@@ -353,7 +353,10 @@ export function UploadFilesStep({
                       </Button>
                     </div>
                   </div>
-                  <Progress value={uploadingFile.progress} className='h-2' />
+                  <Progress
+                    value={Math.round(uploadingFile.progress)}
+                    className='h-2'
+                  />
                 </div>
               );
             })}
