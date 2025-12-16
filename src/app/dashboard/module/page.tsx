@@ -4,7 +4,6 @@ import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   IconPlayerPlay,
   IconVolume,
@@ -26,16 +25,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import ChartIcon from '@/components/ui/icon/chart';
-import VideoIcon from '@/components/ui/icon/video';
-import VolumnIcon from '@/components/ui/icon/volumn';
 import {
   Globe,
   ListFilter,
@@ -52,6 +42,7 @@ import { useModules, useResources } from '@/hooks/use-lms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const videoScripts = [
   {
